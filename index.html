@@ -1,0 +1,1993 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>TechTicket — Support System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  :root {
+    --matcha: #4a7c59;
+    --matcha-light: #6dab84;
+    --matcha-pale: #e8f5ee;
+    --matcha-dark: #2d5238;
+    --cherry: #c0392b;
+    --cherry-light: #e74c3c;
+    --cherry-pale: #fdecea;
+    --cherry-dark: #922b21;
+    --bg: #f5f9f6;
+    --surface: #ffffff;
+    --surface2: #f0f6f2;
+    --border: #d4e6da;
+    --text: #1a2e22;
+    --text2: #4a6356;
+    --text3: #7a9987;
+    --shadow: 0 2px 12px rgba(74,124,89,0.10);
+    --shadow-lg: 0 8px 32px rgba(74,124,89,0.15);
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  /* ===== LOGIN PAGE ===== */
+  #loginPage {
+    display: flex; min-height: 100vh; overflow: hidden;
+  }
+  .login-left {
+    flex: 1; background: linear-gradient(135deg, var(--matcha-dark) 0%, var(--matcha) 50%, var(--matcha-light) 100%);
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    padding: 3rem; position: relative; overflow: hidden;
+  }
+  .login-left::before {
+    content: ''; position: absolute; width: 400px; height: 400px;
+    border: 60px solid rgba(255,255,255,0.05); border-radius: 50%;
+    top: -100px; left: -100px;
+  }
+  .login-left::after {
+    content: ''; position: absolute; width: 300px; height: 300px;
+    border: 40px solid rgba(255,255,255,0.05); border-radius: 50%;
+    bottom: -80px; right: -80px;
+  }
+  .login-brand { text-align: center; z-index: 1; }
+  .login-brand .logo-icon {
+    width: 80px; height: 80px; background: rgba(255,255,255,0.15);
+    border-radius: 20px; display: flex; align-items: center; justify-content: center;
+    font-size: 36px; margin: 0 auto 1.5rem; backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.2);
+  }
+  .login-brand h1 { font-family: 'Playfair Display', serif; color: #fff; font-size: 2.5rem; margin-bottom: 0.5rem; }
+  .login-brand p { color: rgba(255,255,255,0.75); font-size: 1rem; line-height: 1.6; max-width: 300px; }
+  .login-stats { display: flex; gap: 2rem; margin-top: 3rem; z-index: 1; }
+  .login-stat { text-align: center; }
+  .login-stat .num { font-size: 1.8rem; font-weight: 700; color: #fff; }
+  .login-stat .lbl { font-size: 0.75rem; color: rgba(255,255,255,0.65); margin-top: 2px; }
+  .login-ticker { margin-top: 2.5rem; z-index: 1; width: 100%; max-width: 340px; }
+  .ticker-label { color: rgba(255,255,255,0.6); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+  .ticker-items { display: flex; flex-direction: column; gap: 8px; }
+  .ticker-item {
+    background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 8px; padding: 10px 14px; display: flex; justify-content: space-between;
+    align-items: center; color: #fff; font-size: 0.82rem;
+  }
+  .ticker-badge {
+    padding: 2px 8px; border-radius: 20px; font-size: 0.7rem; font-weight: 600;
+  }
+  .ticker-badge.up { background: rgba(109,171,132,0.4); color: #a8edc0; }
+  .ticker-badge.down { background: rgba(192,57,43,0.4); color: #f5b7b1; }
+
+  .login-right {
+    flex: 0 0 480px; display: flex; flex-direction: column; justify-content: center;
+    padding: 3rem; background: var(--surface);
+  }
+  .login-right h2 { font-size: 1.8rem; font-weight: 700; margin-bottom: 0.4rem; }
+  .login-right .subtitle { color: var(--text2); font-size: 0.9rem; margin-bottom: 2.5rem; }
+  .form-group { margin-bottom: 1.2rem; }
+  .form-group label { display: block; font-size: 0.82rem; font-weight: 500; margin-bottom: 6px; color: var(--text2); }
+  .form-group input {
+    width: 100%; padding: 12px 16px; border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm); font-size: 0.95rem; font-family: 'Inter', sans-serif;
+    background: var(--bg); color: var(--text); transition: border-color 0.2s;
+    outline: none;
+  }
+  .form-group input:focus { border-color: var(--matcha); background: #fff; }
+  .btn-login {
+    width: 100%; padding: 14px; background: var(--matcha); color: #fff;
+    border: none; border-radius: var(--radius-sm); font-size: 1rem; font-weight: 600;
+    cursor: pointer; transition: background 0.2s, transform 0.1s;
+    margin-top: 0.5rem; font-family: 'Inter', sans-serif;
+  }
+  .btn-login:hover { background: var(--matcha-dark); }
+  .btn-login:active { transform: scale(0.98); }
+  .login-hint { text-align: center; margin-top: 1.5rem; font-size: 0.82rem; color: var(--text3); }
+  .login-hint span { color: var(--matcha); font-weight: 500; cursor: pointer; }
+  .auth-panel { display: none; }
+  .auth-panel.active { display: block; }
+  .error-msg {
+    background: var(--cherry-pale); border: 1px solid #f5b7b1; border-radius: var(--radius-sm);
+    padding: 10px 14px; font-size: 0.83rem; color: var(--cherry-dark);
+    margin-bottom: 1rem; display: none;
+  }
+  .success-msg {
+    background: var(--matcha-pale); border: 1px solid var(--matcha-light); border-radius: var(--radius-sm);
+    padding: 10px 14px; font-size: 0.83rem; color: var(--matcha-dark);
+    margin-bottom: 1rem; display: none;
+  }
+
+  /* ===== DARK MODE ===== */
+  body.theme-dark {
+    --bg: #0f1a14; --surface: #1a2820; --surface2: #223328;
+    --border: #2d4a38; --text: #e8f5ee; --text2: #9dc4ac; --text3: #5a8a6a;
+    --matcha-pale: #1a3024; --cherry-pale: #2a1010;
+    --shadow: 0 2px 12px rgba(0,0,0,0.4); --shadow-lg: 0 8px 32px rgba(0,0,0,0.5);
+  }
+  body.theme-white {
+    --bg: #ffffff; --surface: #fafafa; --surface2: #f3f3f3;
+    --border: #e0e0e0; --text: #1a1a1a; --text2: #555; --text3: #999;
+    --matcha: #3a7d44; --matcha-pale: #eaf5ec; --shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+
+  /* ===== MAIN APP ===== */
+  #appPage { display: none; min-height: 100vh; flex-direction: column; }
+  .topbar {
+    height: 64px; background: var(--surface); border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; padding: 0 2rem; position: fixed; top: 0; left: 0; right: 0;
+    z-index: 100; box-shadow: var(--shadow);
+  }
+  .topbar-brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 1.1rem; }
+  .topbar-brand .dot { width: 28px; height: 28px; background: var(--matcha); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 14px; }
+  .topbar-spacer { flex: 1; }
+  .topbar-actions { display: flex; align-items: center; gap: 1rem; }
+  .notif-btn {
+    width: 38px; height: 38px; border-radius: 50%; border: 1.5px solid var(--border);
+    background: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    font-size: 18px; position: relative; color: var(--text2);
+  }
+  .notif-dot {
+    width: 8px; height: 8px; background: var(--cherry); border-radius: 50%;
+    position: absolute; top: 6px; right: 6px; border: 2px solid #fff;
+  }
+  .profile-wrap { position: relative; }
+  .profile-btn {
+    display: flex; align-items: center; gap: 8px; padding: 6px 12px;
+    border: 1.5px solid var(--border); border-radius: 40px; background: none;
+    cursor: pointer; font-family: 'Inter', sans-serif; transition: border-color 0.2s;
+  }
+  .profile-btn:hover { border-color: var(--matcha); }
+  .avatar {
+    width: 30px; height: 30px; border-radius: 50%; background: var(--matcha);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 12px; font-weight: 600;
+  }
+  .profile-name { font-size: 0.85rem; font-weight: 500; }
+  .profile-chevron { font-size: 10px; color: var(--text3); }
+  .profile-dropdown {
+    display: none; position: absolute; right: 0; top: calc(100% + 8px);
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow-lg); min-width: 200px; overflow: hidden; z-index: 200;
+  }
+  .profile-dropdown.open { display: block; }
+  .pd-header { padding: 14px 16px; border-bottom: 1px solid var(--border); }
+  .pd-name { font-weight: 600; font-size: 0.9rem; }
+  .pd-email { font-size: 0.78rem; color: var(--text3); }
+  .pd-item {
+    padding: 11px 16px; display: flex; align-items: center; gap: 10px;
+    font-size: 0.88rem; cursor: pointer; transition: background 0.15s; color: var(--text);
+    text-decoration: none;
+  }
+  .pd-item:hover { background: var(--surface2); }
+  .pd-item.danger { color: var(--cherry); }
+  .pd-item.danger:hover { background: var(--cherry-pale); }
+
+  /* ===== NOTIFICATION PANEL ===== */
+  .notif-panel {
+    display: none; position: fixed; right: 1.5rem; top: 72px;
+    width: 420px; max-height: 80vh; overflow-y: auto;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow-lg);
+    z-index: 300;
+  }
+  .notif-panel.open { display: block; }
+  .notif-panel-header {
+    padding: 16px 20px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; background: var(--surface); z-index: 1;
+  }
+  .notif-panel-header h3 { font-size: 1rem; font-weight: 700; }
+  .notif-panel-close {
+    background: none; border: none; cursor: pointer; font-size: 18px;
+    color: var(--text3); line-height: 1; padding: 2px;
+  }
+  .notif-tabs { display: flex; border-bottom: 1px solid var(--border); }
+  .notif-tab {
+    flex: 1; padding: 10px; background: none; border: none; cursor: pointer;
+    font-size: 0.83rem; font-weight: 500; color: var(--text2);
+    border-bottom: 2px solid transparent; transition: all 0.15s;
+    font-family: 'Inter', sans-serif;
+  }
+  .notif-tab.active { color: var(--matcha); border-bottom-color: var(--matcha); }
+  .notif-section { display: none; padding: 12px; }
+  .notif-section.active { display: block; }
+  .notif-transport-card {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 14px; border-radius: var(--radius-sm);
+    border: 1px solid var(--border); margin-bottom: 8px;
+    background: var(--surface2); transition: border-color 0.2s;
+  }
+  .notif-transport-card:hover { border-color: var(--matcha); }
+  .ntc-icon { font-size: 1.6rem; flex-shrink: 0; }
+  .ntc-body { flex: 1; min-width: 0; }
+  .ntc-name { font-size: 0.88rem; font-weight: 600; }
+  .ntc-detail { font-size: 0.76rem; color: var(--text2); margin-top: 2px; }
+  .ntc-right { text-align: right; flex-shrink: 0; }
+  .ntc-time { font-size: 0.82rem; font-weight: 600; }
+  .ntc-eta { font-size: 0.72rem; color: var(--text3); margin-top: 2px; }
+  .ntc-badge {
+    padding: 2px 8px; border-radius: 20px; font-size: 0.68rem; font-weight: 700;
+    display: inline-block; margin-top: 4px;
+  }
+  .ntc-ontime { background: #d5f5e3; color: #1e8449; }
+  .ntc-delayed { background: var(--cherry-pale); color: var(--cherry-dark); }
+  .ntc-boarding { background: #fef9e7; color: #9a5c0e; }
+  .ntc-departed { background: #eaf2fb; color: #1a5276; }
+  .notif-group-label {
+    font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 1px; color: var(--text3); margin: 12px 0 6px;
+  }
+  .live-dot {
+    display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+    background: #2ecc71; margin-right: 5px; animation: pulse 1.5s infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+  /* ===== MY PROFILE PAGE ===== */
+  .profile-page-header {
+    display: flex; align-items: center; gap: 1.5rem; margin-bottom: 2rem;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 1.8rem; box-shadow: var(--shadow);
+  }
+  .profile-avatar-lg {
+    width: 80px; height: 80px; border-radius: 50%; background: var(--matcha);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 2rem; font-weight: 700; flex-shrink: 0;
+    border: 4px solid var(--matcha-pale);
+  }
+  .profile-meta h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 4px; }
+  .profile-meta .role-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: var(--matcha-pale); color: var(--matcha-dark);
+    padding: 3px 12px; border-radius: 20px; font-size: 0.78rem; font-weight: 600;
+  }
+  .profile-meta .pm-email { color: var(--text2); font-size: 0.88rem; margin-top: 6px; }
+  .profile-stats-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1.5rem;
+  }
+  .pstat-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 1.2rem 1rem;
+    text-align: center; box-shadow: var(--shadow);
+  }
+  .pstat-card .ps-num { font-size: 1.8rem; font-weight: 700; }
+  .pstat-card .ps-label { font-size: 0.75rem; color: var(--text3); margin-top: 4px; font-weight: 500; }
+  .profile-content-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+  .access-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 0; border-bottom: 1px solid var(--border);
+  }
+  .access-item:last-child { border-bottom: none; }
+  .access-icon { font-size: 1.3rem; width: 36px; text-align: center; }
+  .access-label { font-size: 0.88rem; font-weight: 600; flex: 1; }
+  .access-badge {
+    padding: 2px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 600;
+  }
+  .access-full { background: var(--matcha-pale); color: var(--matcha-dark); }
+  .access-view { background: #eaf2fb; color: #1a5276; }
+  .access-none { background: #f0f3f4; color: #566573; }
+  .ticket-mini-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 0.83rem;
+  }
+  .ticket-mini-row:last-child { border-bottom: none; }
+  .tm-id { font-weight: 700; color: var(--matcha); min-width: 50px; }
+  .tm-subject { flex: 1; color: var(--text); }
+  .resolution-timeline { display: flex; flex-direction: column; gap: 0; }
+  .rtl-item {
+    display: flex; gap: 12px; position: relative; padding-bottom: 16px;
+  }
+  .rtl-item:last-child { padding-bottom: 0; }
+  .rtl-dot-wrap { display: flex; flex-direction: column; align-items: center; }
+  .rtl-dot {
+    width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; margin-top: 3px;
+  }
+  .rtl-line {
+    width: 2px; flex: 1; background: var(--border); margin-top: 4px;
+  }
+  .rtl-item:last-child .rtl-line { display: none; }
+  .rtl-body { flex: 1; }
+  .rtl-title { font-size: 0.85rem; font-weight: 600; }
+  .rtl-time { font-size: 0.75rem; color: var(--text3); margin-top: 2px; }
+
+  .layout { display: flex; padding-top: 64px; min-height: 100vh; }
+  .sidebar {
+    width: 240px; position: fixed; left: 0; top: 64px; bottom: 0;
+    background: var(--surface); border-right: 1px solid var(--border);
+    padding: 1.5rem 1rem; overflow-y: auto; z-index: 90;
+  }
+  .sidebar-section { margin-bottom: 2rem; }
+  .sidebar-label { font-size: 0.68rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1.2px; color: var(--text3); padding: 0 8px; margin-bottom: 6px; }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+    border-radius: var(--radius-sm); cursor: pointer; color: var(--text2);
+    font-size: 0.88rem; font-weight: 500; transition: all 0.15s;
+    margin-bottom: 2px;
+  }
+  .nav-item:hover { background: var(--matcha-pale); color: var(--matcha-dark); }
+  .nav-item.active { background: var(--matcha-pale); color: var(--matcha-dark); font-weight: 600; }
+  .nav-item .ni-icon { width: 20px; text-align: center; font-size: 16px; }
+  .nav-item .ni-badge {
+    margin-left: auto; background: var(--cherry); color: #fff;
+    font-size: 0.68rem; font-weight: 700; padding: 1px 6px; border-radius: 20px;
+  }
+  .nav-item .ni-arrow { margin-left: auto; font-size: 10px; transition: transform 0.2s; }
+  .nav-item.expanded .ni-arrow { transform: rotate(90deg); }
+  .nav-sub { padding-left: 32px; overflow: hidden; max-height: 0; transition: max-height 0.3s ease; }
+  .nav-sub.open { max-height: 200px; }
+  .nav-sub-item {
+    display: flex; align-items: center; gap: 8px; padding: 8px 12px;
+    border-radius: var(--radius-sm); cursor: pointer; color: var(--text2);
+    font-size: 0.83rem; transition: all 0.15s; margin-bottom: 1px;
+  }
+  .nav-sub-item:hover { background: var(--matcha-pale); color: var(--matcha); }
+  .nav-sub-item.active { color: var(--matcha); font-weight: 500; }
+
+  .main { margin-left: 240px; flex: 1; padding: 2rem; }
+  .page { display: none; }
+  .page.active { display: block; }
+  .page-header { margin-bottom: 2rem; }
+  .page-header h2 { font-size: 1.6rem; font-weight: 700; margin-bottom: 0.25rem; }
+  .page-header p { color: var(--text2); font-size: 0.9rem; }
+
+  /* ===== CARDS ===== */
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 1.5rem; margin-bottom: 1.5rem;
+    box-shadow: var(--shadow);
+  }
+  .card-title { font-size: 1rem; font-weight: 600; margin-bottom: 1rem; display: flex; align-items: center; gap: 8px; }
+  .card-title .ct-icon { font-size: 18px; }
+
+  /* ===== STATS ROW ===== */
+  .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
+  .stat-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 1.2rem 1.4rem; box-shadow: var(--shadow);
+  }
+  .stat-card .sc-label { font-size: 0.78rem; color: var(--text3); margin-bottom: 6px; font-weight: 500; }
+  .stat-card .sc-value { font-size: 1.8rem; font-weight: 700; }
+  .stat-card .sc-meta { font-size: 0.75rem; color: var(--text3); margin-top: 4px; }
+  .sc-high { border-left: 4px solid var(--cherry); }
+  .sc-medium { border-left: 4px solid #f39c12; }
+  .sc-low { border-left: 4px solid var(--matcha); }
+  .sc-total { border-left: 4px solid #8e44ad; }
+
+  /* ===== PRIORITY BADGES ===== */
+  .badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 3px 10px; border-radius: 20px; font-size: 0.73rem; font-weight: 600;
+  }
+  .badge-high { background: var(--cherry-pale); color: var(--cherry-dark); }
+  .badge-medium { background: #fef9e7; color: #b7770d; }
+  .badge-low { background: var(--matcha-pale); color: var(--matcha-dark); }
+  .badge-open { background: #eaf2fb; color: #1a5276; }
+  .badge-ongoing { background: #fef5e7; color: #9a5c0e; }
+  .badge-working { background: var(--matcha-pale); color: var(--matcha-dark); }
+  .badge-closed { background: #f0f3f4; color: #566573; }
+
+  /* ===== REPORT ISSUE ===== */
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .form-field { margin-bottom: 1.2rem; }
+  .form-field label { display: block; font-size: 0.83rem; font-weight: 500; margin-bottom: 6px; color: var(--text2); }
+  .form-field input, .form-field select, .form-field textarea {
+    width: 100%; padding: 10px 14px; border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm); font-size: 0.9rem; font-family: 'Inter', sans-serif;
+    background: var(--bg); color: var(--text); transition: border-color 0.2s; outline: none;
+  }
+  .form-field input:focus, .form-field select:focus, .form-field textarea:focus { border-color: var(--matcha); background: #fff; }
+  .form-field textarea { resize: vertical; min-height: 90px; }
+  .upload-zone {
+    border: 2px dashed var(--border); border-radius: var(--radius);
+    padding: 2rem; text-align: center; cursor: pointer; transition: all 0.2s;
+    background: var(--surface2);
+  }
+  .upload-zone:hover { border-color: var(--matcha); background: var(--matcha-pale); }
+  .upload-zone .uz-icon { font-size: 2.5rem; margin-bottom: 0.5rem; }
+  .upload-zone p { color: var(--text2); font-size: 0.88rem; }
+  .upload-zone span { color: var(--matcha); font-weight: 600; }
+  .upload-preview { display: none; align-items: center; gap: 12px; padding: 12px; background: var(--matcha-pale); border-radius: var(--radius-sm); margin-top: 10px; }
+  .btn-submit {
+    padding: 12px 28px; background: var(--matcha); color: #fff;
+    border: none; border-radius: var(--radius-sm); font-size: 0.95rem; font-weight: 600;
+    cursor: pointer; font-family: 'Inter', sans-serif; transition: all 0.2s;
+  }
+  .btn-submit:hover { background: var(--matcha-dark); }
+  .btn-secondary {
+    padding: 12px 28px; background: none; color: var(--text2);
+    border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-size: 0.95rem;
+    cursor: pointer; font-family: 'Inter', sans-serif; transition: all 0.2s; margin-right: 10px;
+  }
+  .btn-secondary:hover { border-color: var(--matcha); color: var(--matcha); }
+  .success-toast {
+    display: none; background: var(--matcha-pale); border: 1px solid var(--matcha-light);
+    border-radius: var(--radius-sm); padding: 12px 16px; margin-top: 1rem;
+    color: var(--matcha-dark); font-size: 0.88rem; font-weight: 500;
+    align-items: center; gap: 8px;
+  }
+
+  /* ===== PROGRESS PAGE ===== */
+  .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+  .chart-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; box-shadow: var(--shadow); }
+  .chart-wrap h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 1rem; }
+  .chart-canvas-wrap { position: relative; height: 240px; }
+  .progress-bar-list { display: flex; flex-direction: column; gap: 14px; }
+  .pbl-item .pbl-head { display: flex; justify-content: space-between; font-size: 0.83rem; margin-bottom: 5px; }
+  .pbl-bar { height: 8px; background: var(--surface2); border-radius: 4px; overflow: hidden; }
+  .pbl-fill { height: 100%; border-radius: 4px; transition: width 1s ease; }
+  .filter-row { display: flex; gap: 8px; margin-bottom: 1.5rem; flex-wrap: wrap; }
+  .filter-btn {
+    padding: 6px 16px; border-radius: 20px; border: 1.5px solid var(--border);
+    background: var(--surface); cursor: pointer; font-size: 0.82rem; font-weight: 500;
+    font-family: 'Inter', sans-serif; transition: all 0.15s; color: var(--text2);
+  }
+  .filter-btn:hover { border-color: var(--matcha); color: var(--matcha); }
+  .filter-btn.active { background: var(--matcha); color: #fff; border-color: var(--matcha); }
+  .filter-btn.active.red { background: var(--cherry); border-color: var(--cherry); }
+  .filter-btn.active.amber { background: #e67e22; border-color: #e67e22; }
+
+  /* ===== TICKETS TABLE ===== */
+  .tickets-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+  .tickets-table th { text-align: left; padding: 10px 14px; color: var(--text3); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border); }
+  .tickets-table td { padding: 12px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  .tickets-table tr:last-child td { border-bottom: none; }
+  .tickets-table tr:hover td { background: var(--surface2); }
+  .status-select {
+    padding: 4px 10px; border-radius: 20px; border: 1px solid var(--border);
+    font-size: 0.78rem; font-family: 'Inter', sans-serif; cursor: pointer;
+    background: var(--surface); outline: none;
+  }
+
+  /* ===== TRANSPORT TABS ===== */
+  .transport-tabs { display: flex; gap: 4px; background: var(--surface2); border-radius: var(--radius); padding: 4px; margin-bottom: 1.5rem; }
+  .ttab {
+    flex: 1; padding: 10px; text-align: center; border-radius: var(--radius-sm);
+    cursor: pointer; font-size: 0.88rem; font-weight: 500; color: var(--text2);
+    transition: all 0.2s; border: none; background: none; font-family: 'Inter', sans-serif;
+  }
+  .ttab.active { background: var(--surface); color: var(--matcha-dark); box-shadow: var(--shadow); font-weight: 600; }
+  .transport-sub-tabs { display: flex; gap: 8px; margin-bottom: 1.5rem; }
+  .tstab {
+    padding: 7px 18px; border-radius: 20px; border: 1.5px solid var(--border);
+    background: var(--surface); cursor: pointer; font-size: 0.82rem; font-weight: 500;
+    font-family: 'Inter', sans-serif; transition: all 0.15s; color: var(--text2);
+  }
+  .tstab.active { background: var(--matcha); color: #fff; border-color: var(--matcha); }
+  .transport-content { display: none; }
+  .transport-content.active { display: block; }
+  .transport-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 1.2rem 1.5rem; margin-bottom: 0.75rem; display: flex; align-items: center;
+    gap: 1rem; transition: box-shadow 0.2s;
+  }
+  .transport-card:hover { box-shadow: var(--shadow-lg); }
+  .tc-icon { width: 44px; height: 44px; border-radius: 12px; background: var(--matcha-pale); display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+  .tc-main { flex: 1; }
+  .tc-name { font-weight: 600; font-size: 0.95rem; }
+  .tc-detail { font-size: 0.8rem; color: var(--text3); margin-top: 2px; }
+  .tc-time { text-align: right; }
+  .tc-time .time { font-size: 1.1rem; font-weight: 700; }
+  .tc-time .eta { font-size: 0.75rem; color: var(--text3); }
+  .tc-status { text-align: right; }
+
+  /* ===== DASHBOARD ===== */
+  .recent-table-wrap { overflow-x: auto; }
+  .activity-feed { display: flex; flex-direction: column; gap: 12px; }
+  .af-item { display: flex; align-items: flex-start; gap: 12px; }
+  .af-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+  .af-content .af-title { font-size: 0.88rem; font-weight: 500; }
+  .af-content .af-time { font-size: 0.75rem; color: var(--text3); margin-top: 2px; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+
+  /* ===== SETTINGS PAGE ===== */
+  .settings-grid { display: grid; grid-template-columns: 240px 1fr; gap: 1.5rem; }
+  .settings-nav { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 0.75rem; height: fit-content; }
+  .snav-item {
+    display: flex; align-items: center; gap: 10px; padding: 10px 14px;
+    border-radius: var(--radius-sm); cursor: pointer; font-size: 0.88rem; font-weight: 500;
+    color: var(--text2); transition: all 0.15s; margin-bottom: 2px;
+  }
+  .snav-item:hover { background: var(--matcha-pale); color: var(--matcha-dark); }
+  .snav-item.active { background: var(--matcha-pale); color: var(--matcha-dark); font-weight: 600; }
+  .settings-section { display: none; }
+  .settings-section.active { display: block; }
+  .settings-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; margin-bottom: 1rem; }
+  .settings-card h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.25rem; }
+  .settings-card .sc-desc { font-size: 0.82rem; color: var(--text3); margin-bottom: 1.25rem; }
+  .theme-options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .theme-card {
+    border: 2px solid var(--border); border-radius: var(--radius); padding: 1rem;
+    cursor: pointer; text-align: center; transition: all 0.2s;
+  }
+  .theme-card:hover { border-color: var(--matcha-light); }
+  .theme-card.selected { border-color: var(--matcha); }
+  .theme-preview { height: 60px; border-radius: 8px; margin-bottom: 10px; border: 1px solid var(--border); overflow: hidden; display: flex; gap: 4px; padding: 6px; }
+  .tp-sidebar { width: 30%; border-radius: 4px; }
+  .tp-main { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+  .tp-bar { border-radius: 3px; height: 8px; }
+  .theme-name { font-size: 0.82rem; font-weight: 600; }
+  .theme-check { width: 18px; height: 18px; border-radius: 50%; background: var(--matcha); color: #fff; font-size: 10px; display: none; align-items: center; justify-content: center; margin: 6px auto 0; }
+  .theme-card.selected .theme-check { display: flex; }
+  .toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border); }
+  .toggle-row:last-child { border-bottom: none; }
+  .toggle-label { font-size: 0.88rem; font-weight: 500; }
+  .toggle-desc { font-size: 0.78rem; color: var(--text3); margin-top: 2px; }
+  .toggle-switch { position: relative; width: 44px; height: 24px; }
+  .toggle-switch input { opacity: 0; width: 0; height: 0; }
+  .toggle-slider {
+    position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+    background: var(--border); border-radius: 24px; transition: 0.3s;
+  }
+  .toggle-slider:before { content: ''; position: absolute; height: 18px; width: 18px; left: 3px; bottom: 3px; background: white; border-radius: 50%; transition: 0.3s; }
+  .toggle-switch input:checked + .toggle-slider { background: var(--matcha); }
+  .toggle-switch input:checked + .toggle-slider:before { transform: translateX(20px); }
+  .settings-btn {
+    padding: 10px 22px; border-radius: var(--radius-sm); font-size: 0.88rem; font-weight: 600;
+    cursor: pointer; font-family: 'Inter', sans-serif; border: none; transition: all 0.2s;
+  }
+  .settings-btn.primary { background: var(--matcha); color: #fff; }
+  .settings-btn.primary:hover { background: var(--matcha-dark); }
+  .settings-btn.danger { background: var(--cherry-pale); color: var(--cherry); border: 1px solid #f5b7b1; }
+  .settings-btn.danger:hover { background: var(--cherry-pale); }
+
+  /* ===== OTP / FORGOT PASSWORD ===== */
+  .otp-boxes { display: flex; gap: 10px; justify-content: center; margin: 1.5rem 0; }
+  .otp-box {
+    width: 52px; height: 58px; border: 2px solid var(--border); border-radius: var(--radius-sm);
+    text-align: center; font-size: 1.5rem; font-weight: 700; font-family: 'Inter', sans-serif;
+    background: var(--bg); color: var(--text); outline: none; transition: border-color 0.2s;
+  }
+  .otp-box:focus { border-color: var(--matcha); background: var(--surface); }
+  .resend-link { text-align: center; font-size: 0.82rem; color: var(--text3); margin-top: 0.5rem; }
+  .resend-link span { color: var(--matcha); font-weight: 500; cursor: pointer; }
+  .otp-sent-to { background: var(--matcha-pale); border: 1px solid var(--matcha-light); border-radius: var(--radius-sm); padding: 10px 14px; font-size: 0.83rem; color: var(--matcha-dark); margin-bottom: 1rem; text-align: center; }
+
+  @media (max-width: 900px) {
+    .stats-row { grid-template-columns: 1fr 1fr; }
+    .charts-grid { grid-template-columns: 1fr; }
+    .grid-2 { grid-template-columns: 1fr; }
+    .login-left { display: none; }
+    .login-right { flex: 1; }
+    .settings-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== LOGIN PAGE ===== -->
+<div id="loginPage">
+  <div class="login-left">
+    <div class="login-brand">
+      <div class="logo-icon">🎫</div>
+      <h1>TechTicket</h1>
+      <p>Your all-in-one support, progress tracking & transport management hub.</p>
+    </div>
+    <div class="login-stats">
+      <div class="login-stat"><div class="num">2.4k</div><div class="lbl">Tickets Resolved</div></div>
+      <div class="login-stat"><div class="num">98%</div><div class="lbl">Uptime</div></div>
+      <div class="login-stat"><div class="num">14m</div><div class="lbl">Avg Response</div></div>
+    </div>
+    <div class="login-ticker">
+      <div class="ticker-label">Live Transport Feed</div>
+      <div class="ticker-items">
+        <div class="ticker-item"><span>🚂 Express 104 — Hyderabad</span><span class="ticker-badge up">On Time</span></div>
+        <div class="ticker-item"><span>✈️ AI-302 — Bengaluru</span><span class="ticker-badge up">Boarding</span></div>
+        <div class="ticker-item"><span>🚂 Rajdhani 12 — Delhi</span><span class="ticker-badge down">Delayed 15m</span></div>
+        <div class="ticker-item"><span>✈️ 6E-781 — Mumbai</span><span class="ticker-badge up">Departed</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="login-right">
+
+    <!-- LOGIN PANEL -->
+    <div class="auth-panel active" id="panelLogin">
+      <h2>Welcome back 👋</h2>
+      <p class="subtitle">Sign in to your TechTicket account.</p>
+      <div class="error-msg" id="loginError"></div>
+      <div class="form-group">
+        <label>Email address</label>
+        <input type="email" id="loginEmail" placeholder="you@company.com"/>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="loginPwd" placeholder="Enter your password"/>
+      </div>
+      <div style="display:flex;justify-content:flex-end;margin-bottom:1rem;">
+        <span style="font-size:0.82rem;color:var(--matcha);cursor:pointer;font-weight:500;" onclick="switchToForgot1()">Forgot password?</span>
+      </div>
+      <button class="btn-login" onclick="doLogin()">Sign in to TechTicket</button>
+      <div class="login-hint">Don't have an account? <span onclick="switchToSignup()">Create one here</span></div>
+    </div>
+
+    <!-- SIGNUP PANEL -->
+    <div class="auth-panel" id="panelSignup">
+      <h2>Create account ✨</h2>
+      <p class="subtitle">Join TechTicket — it's free and takes 30 seconds.</p>
+      <div class="error-msg" id="signupError"></div>
+      <div class="success-msg" id="signupSuccess"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="form-group">
+          <label>First name</label>
+          <input type="text" id="signupFirst" placeholder="Priya"/>
+        </div>
+        <div class="form-group">
+          <label>Last name</label>
+          <input type="text" id="signupLast" placeholder="Sharma"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Email address</label>
+        <input type="email" id="signupEmail" placeholder="you@company.com"/>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="signupPwd" placeholder="At least 6 characters"/>
+      </div>
+      <div class="form-group">
+        <label>Confirm password</label>
+        <input type="password" id="signupPwd2" placeholder="Repeat your password"/>
+      </div>
+      <button class="btn-login" onclick="doSignup()">Create my account</button>
+      <div class="login-hint">Already have an account? <span onclick="switchToLogin()">Sign in</span></div>
+    </div>
+
+    <!-- FORGOT PASSWORD — STEP 1: Enter email or phone -->
+    <div class="auth-panel" id="panelForgot1">
+      <h2>Reset password 🔑</h2>
+      <p class="subtitle">Enter your email address or phone number and we'll send you a verification code.</p>
+      <div class="error-msg" id="forgotError1"></div>
+      <div class="form-group" style="margin-bottom:0.75rem;">
+        <label>Email address or phone number</label>
+        <input type="text" id="forgotContact" placeholder="you@company.com or +91 98765 43210"/>
+      </div>
+      <div style="display:flex;gap:8px;margin:1rem 0;">
+        <button class="btn-login" style="flex:1;" onclick="sendOtp()">Send verification code</button>
+      </div>
+      <div class="login-hint">Remember your password? <span onclick="switchToLogin()">Sign in</span></div>
+    </div>
+
+    <!-- FORGOT PASSWORD — STEP 2: Enter OTP -->
+    <div class="auth-panel" id="panelForgot2">
+      <h2>Enter the code 📲</h2>
+      <p class="subtitle">We sent a 6-digit code to your contact. Enter it below.</p>
+      <div class="otp-sent-to" id="otpSentTo">Code sent to: —</div>
+      <div class="error-msg" id="forgotError2"></div>
+      <div class="otp-boxes">
+        <input class="otp-box" id="otp0" maxlength="1" oninput="otpMove(this,1)" onkeydown="otpBack(event,this,null)"/>
+        <input class="otp-box" id="otp1" maxlength="1" oninput="otpMove(this,2)" onkeydown="otpBack(event,this,0)"/>
+        <input class="otp-box" id="otp2" maxlength="1" oninput="otpMove(this,3)" onkeydown="otpBack(event,this,1)"/>
+        <input class="otp-box" id="otp3" maxlength="1" oninput="otpMove(this,4)" onkeydown="otpBack(event,this,2)"/>
+        <input class="otp-box" id="otp4" maxlength="1" oninput="otpMove(this,5)" onkeydown="otpBack(event,this,3)"/>
+        <input class="otp-box" id="otp5" maxlength="1" oninput="otpMove(this,-1)" onkeydown="otpBack(event,this,4)"/>
+      </div>
+      <div class="resend-link">Didn't receive it? <span onclick="resendOtp()">Resend code</span></div>
+      <button class="btn-login" style="margin-top:1.2rem;" onclick="verifyOtp()">Verify code</button>
+      <div class="login-hint" style="margin-top:1rem;"><span onclick="switchToForgot1()">← Back</span></div>
+    </div>
+
+    <!-- FORGOT PASSWORD — STEP 3: Set new password -->
+    <div class="auth-panel" id="panelForgot3">
+      <h2>New password 🔐</h2>
+      <p class="subtitle">Almost done! Set a new password for your account.</p>
+      <div class="error-msg" id="forgotError3"></div>
+      <div class="success-msg" id="forgotSuccess3"></div>
+      <div class="form-group">
+        <label>New password</label>
+        <input type="password" id="newPwd1" placeholder="At least 6 characters"/>
+      </div>
+      <div class="form-group">
+        <label>Confirm new password</label>
+        <input type="password" id="newPwd2" placeholder="Repeat your new password"/>
+      </div>
+      <button class="btn-login" onclick="doResetPassword()">Update password</button>
+      <div class="login-hint" style="margin-top:1rem;"><span onclick="switchToLogin()">Back to sign in</span></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===== APP PAGE ===== -->
+<div id="appPage" style="display:none;">
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="topbar-brand">
+      <div class="dot">🎫</div>
+      <span>TechTicket</span>
+    </div>
+    <div class="topbar-spacer"></div>
+    <div class="topbar-actions">
+      <button class="notif-btn" title="Live Transport Feed" onclick="toggleNotifPanel()" id="notifBtn">🔔<span class="notif-dot"></span></button>
+      <div class="profile-wrap">
+        <button class="profile-btn" onclick="toggleProfile()">
+          <div class="avatar" id="avatarInitials">AD</div>
+          <span class="profile-name" id="profileName">Admin User</span>
+          <span class="profile-chevron">▼</span>
+        </button>
+        <div class="profile-dropdown" id="profileDropdown">
+          <div class="pd-header">
+            <div class="pd-name" id="pdName">Admin User</div>
+            <div class="pd-email" id="pdEmail">admin@techticket.com</div>
+          </div>
+          <a class="pd-item" onclick="showPage('dashboard')">🏠 Dashboard</a>
+          <a class="pd-item" onclick="showPage('settings')">⚙️ Settings</a>
+          <a class="pd-item" onclick="showPage('myprofile');document.getElementById('profileDropdown').classList.remove('open');">👤 My Profile</a>
+          <a class="pd-item danger" onclick="doLogout()">🚪 Logout</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NOTIFICATION PANEL -->
+  <div class="notif-panel" id="notifPanel">
+    <div class="notif-panel-header">
+      <h3><span class="live-dot"></span>Live Transport Feed</h3>
+      <button class="notif-panel-close" onclick="toggleNotifPanel()">✕</button>
+    </div>
+    <div class="notif-tabs">
+      <button class="notif-tab active" onclick="switchNotifTab('trains',this)">🚂 Trains</button>
+      <button class="notif-tab" onclick="switchNotifTab('flights',this)">✈️ Flights</button>
+    </div>
+    <div class="notif-section active" id="ntab-trains">
+      <div class="notif-group-label">🟢 Departing Now</div>
+      <div class="notif-transport-card"><div class="ntc-icon">🚂</div><div class="ntc-body"><div class="ntc-name">Hyderabad Express 104</div><div class="ntc-detail">Platform 3 → Bengaluru City Jn</div></div><div class="ntc-right"><div class="ntc-time">14:35</div><div class="ntc-eta">Dep. in 12 min</div><div class="ntc-badge ntc-ontime">On Time</div></div></div>
+      <div class="notif-transport-card"><div class="ntc-icon">🚂</div><div class="ntc-body"><div class="ntc-name">Rajdhani Express 02430</div><div class="ntc-detail">Platform 1 → New Delhi</div></div><div class="ntc-right"><div class="ntc-time">15:00</div><div class="ntc-eta">Dep. in 37 min</div><div class="ntc-badge ntc-ontime">On Time</div></div></div>
+      <div class="notif-transport-card"><div class="ntc-icon">🚂</div><div class="ntc-body"><div class="ntc-name">Godavari Express 7006</div><div class="ntc-detail">Platform 5 → Visakhapatnam</div></div><div class="ntc-right"><div class="ntc-time">15:45</div><div class="ntc-eta">Dep. in 82 min</div><div class="ntc-badge ntc-ontime">On Time</div></div></div>
+      <div class="notif-group-label">🔵 Arriving</div>
+      <div class="notif-transport-card"><div class="ntc-icon">🚂</div><div class="ntc-body"><div class="ntc-name">Charminar Express 2760</div><div class="ntc-detail">From Chennai Central · Platform 2</div></div><div class="ntc-right"><div class="ntc-time">14:28</div><div class="ntc-eta">Arr. in 5 min</div><div class="ntc-badge ntc-boarding">Arriving</div></div></div>
+      <div class="notif-transport-card"><div class="ntc-icon">🚂</div><div class="ntc-body"><div class="ntc-name">Falaknuma Express 7032</div><div class="ntc-detail">From Mumbai CST · Platform 4</div></div><div class="ntc-right"><div class="ntc-time">14:55</div><div class="ntc-eta">Arr. in 32 min</div><div class="ntc-badge ntc-ontime">On Track</div></div></div>
+      <div class="notif-group-label">📍 At Station Now</div>
+      <div class="notif-transport-card"><div class="ntc-icon">🚂</div><div class="ntc-body"><div class="ntc-name">Nanded Express 7605</div><div class="ntc-detail">Platform 6 — Boarding open</div></div><div class="ntc-right"><div class="ntc-time">Now</div><div class="ntc-eta">Departs 14:50</div><div class="ntc-badge ntc-boarding">Boarding</div></div></div>
+      <div class="notif-group-label">⚠️ Delayed</div>
+      <div class="notif-transport-card"><div class="ntc-icon">🚂</div><div class="ntc-body"><div class="ntc-name">Rajdhani 12 — Delhi</div><div class="ntc-detail">Platform 2 — Signal hold</div></div><div class="ntc-right"><div class="ntc-time">15:30</div><div class="ntc-eta">Was 15:15</div><div class="ntc-badge ntc-delayed">Delayed 15m</div></div></div>
+      <div style="text-align:center;margin:14px 0 4px;"><button onclick="showPage('transport');toggleNotifPanel();" style="background:var(--matcha);color:#fff;border:none;border-radius:8px;padding:8px 20px;font-size:0.83rem;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;">View Full Train Board →</button></div>
+    </div>
+    <div class="notif-section" id="ntab-flights">
+      <div class="notif-group-label">📍 At Airport</div>
+      <div class="notif-transport-card"><div class="ntc-icon">✈️</div><div class="ntc-body"><div class="ntc-name">Air India AI-302</div><div class="ntc-detail">Gate A4 — Bengaluru · Boeing 787 · T1</div></div><div class="ntc-right"><div class="ntc-time">14:40</div><div class="ntc-eta">Boarding now</div><div class="ntc-badge ntc-boarding">Boarding</div></div></div>
+      <div class="notif-transport-card"><div class="ntc-icon">✈️</div><div class="ntc-body"><div class="ntc-name">IndiGo 6E-781</div><div class="ntc-detail">Gate B12 — Mumbai · A320 · T2</div></div><div class="ntc-right"><div class="ntc-time">15:15</div><div class="ntc-eta">Boarding 15:15</div><div class="ntc-badge ntc-ontime">On Time</div></div></div>
+      <div class="notif-group-label">🛫 Departing</div>
+      <div class="notif-transport-card"><div class="ntc-icon">✈️</div><div class="ntc-body"><div class="ntc-name">SpiceJet SG-412</div><div class="ntc-detail">Runway 27L → Chennai</div></div><div class="ntc-right"><div class="ntc-time">14:50</div><div class="ntc-eta">Dep. in 27 min</div><div class="ntc-badge ntc-ontime">On Time</div></div></div>
+      <div class="notif-group-label">🛬 Arriving</div>
+      <div class="notif-transport-card"><div class="ntc-icon">✈️</div><div class="ntc-body"><div class="ntc-name">IndiGo 6E-190</div><div class="ntc-detail">From Kolkata · Gate B8</div></div><div class="ntc-right"><div class="ntc-time">15:10</div><div class="ntc-eta">Arr. in 47 min</div><div class="ntc-badge ntc-boarding">Arriving</div></div></div>
+      <div class="notif-transport-card"><div class="ntc-icon">✈️</div><div class="ntc-body"><div class="ntc-name">Emirates EK-524</div><div class="ntc-detail">From Dubai · Gate A9</div></div><div class="ntc-right"><div class="ntc-time">15:55</div><div class="ntc-eta">Arr. in 1h 32m</div><div class="ntc-badge ntc-ontime">On Track</div></div></div>
+      <div class="notif-group-label">✅ Safely Landed</div>
+      <div class="notif-transport-card"><div class="ntc-icon">✈️</div><div class="ntc-body"><div class="ntc-name">Vistara UK-801</div><div class="ntc-detail">Arrived from Mumbai · Gate A2</div></div><div class="ntc-right"><div class="ntc-time">13:42</div><div class="ntc-eta">All disembarked</div><div class="ntc-badge ntc-departed">Landed</div></div></div>
+      <div class="notif-transport-card"><div class="ntc-icon">✈️</div><div class="ntc-body"><div class="ntc-name">SpiceJet SG-888</div><div class="ntc-detail">Arrived from Goa · Gate B3</div></div><div class="ntc-right"><div class="ntc-time">12:58</div><div class="ntc-eta">All clear</div><div class="ntc-badge ntc-departed">Landed</div></div></div>
+      <div style="text-align:center;margin:14px 0 4px;"><button onclick="showPage('transport');document.querySelectorAll('.ttab')[1].click();toggleNotifPanel();" style="background:var(--matcha);color:#fff;border:none;border-radius:8px;padding:8px 20px;font-size:0.83rem;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;">View Full Flight Board →</button></div>
+    </div>
+  </div>
+
+  <!-- Layout -->
+  <div class="layout">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-label">Main</div>
+        <div class="nav-item active" onclick="showPage('dashboard', this)">
+          <span class="ni-icon">🏠</span> Dashboard
+        </div>
+        <div class="nav-item" onclick="showPage('report', this)">
+          <span class="ni-icon">📝</span> Report Issue
+        </div>
+        <div class="nav-item" onclick="showPage('progress', this)">
+          <span class="ni-icon">📊</span> Progress
+        </div>
+        <div class="nav-item" onclick="showPage('tickets', this)">
+          <span class="ni-icon">🎟️</span> All Tickets
+          <span class="ni-badge">8</span>
+        </div>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Transport</div>
+        <div class="nav-item" id="transportNavItem" onclick="toggleTransportNav(this)">
+          <span class="ni-icon">🚉</span> Train & Tickets
+          <span class="ni-arrow">▶</span>
+        </div>
+        <div class="nav-sub" id="transportSub">
+          <div class="nav-sub-item" onclick="showTransportSub('trains')">🚂 Trains</div>
+          <div class="nav-sub-item" onclick="showTransportSub('flights')">✈️ Flights</div>
+        </div>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Account</div>
+        <div class="nav-item" onclick="showPage('settings', this)">⚙️ Settings</div>
+        <div class="nav-item" onclick="doLogout()">🚪 Logout</div>
+      </div>
+    </div>
+
+    <!-- Main content -->
+    <div class="main">
+
+      <!-- DASHBOARD PAGE -->
+      <div class="page active" id="page-dashboard">
+        <div class="page-header">
+          <h2>Dashboard</h2>
+          <p>Overview of all support activity and system health</p>
+        </div>
+        <div class="stats-row">
+          <div class="stat-card sc-high">
+            <div class="sc-label">High Priority</div>
+            <div class="sc-value" style="color:var(--cherry)">7</div>
+            <div class="sc-meta">🔴 3 unassigned</div>
+          </div>
+          <div class="stat-card sc-medium">
+            <div class="sc-label">Medium Priority</div>
+            <div class="sc-value" style="color:#e67e22">12</div>
+            <div class="sc-meta">🟡 5 in progress</div>
+          </div>
+          <div class="stat-card sc-low">
+            <div class="sc-label">Low Priority</div>
+            <div class="sc-value" style="color:var(--matcha)">9</div>
+            <div class="sc-meta">🟢 All assigned</div>
+          </div>
+          <div class="stat-card sc-total">
+            <div class="sc-label">Total Open</div>
+            <div class="sc-value" style="color:#8e44ad">28</div>
+            <div class="sc-meta">↑ 4 from yesterday</div>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-title"><span class="ct-icon">📋</span> Recent Tickets</div>
+            <table class="tickets-table">
+              <thead><tr><th>ID</th><th>Subject</th><th>Priority</th><th>Status</th></tr></thead>
+              <tbody>
+                <tr><td>#1042</td><td>Login page broken</td><td><span class="badge badge-high">High</span></td><td><span class="badge badge-open">Opened</span></td></tr>
+                <tr><td>#1041</td><td>Email not sending</td><td><span class="badge badge-medium">Medium</span></td><td><span class="badge badge-ongoing">On-Going</span></td></tr>
+                <tr><td>#1040</td><td>Slow dashboard load</td><td><span class="badge badge-low">Low</span></td><td><span class="badge badge-working">Working On</span></td></tr>
+                <tr><td>#1039</td><td>Password reset fails</td><td><span class="badge badge-high">High</span></td><td><span class="badge badge-closed">Closed</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="card">
+            <div class="card-title"><span class="ct-icon">⚡</span> Recent Activity</div>
+            <div class="activity-feed">
+              <div class="af-item"><div class="af-dot" style="background:var(--cherry)"></div><div class="af-content"><div class="af-title">New high priority ticket #1042 opened</div><div class="af-time">2 minutes ago</div></div></div>
+              <div class="af-item"><div class="af-dot" style="background:#e67e22"></div><div class="af-content"><div class="af-title">Ticket #1038 moved to Working On</div><div class="af-time">18 minutes ago</div></div></div>
+              <div class="af-item"><div class="af-dot" style="background:var(--matcha)"></div><div class="af-content"><div class="af-title">Ticket #1035 closed successfully</div><div class="af-time">1 hour ago</div></div></div>
+              <div class="af-item"><div class="af-dot" style="background:#8e44ad"></div><div class="af-content"><div class="af-title">New user registered: Priya Sharma</div><div class="af-time">3 hours ago</div></div></div>
+              <div class="af-item"><div class="af-dot" style="background:var(--matcha)"></div><div class="af-content"><div class="af-title">5 tickets resolved this morning</div><div class="af-time">5 hours ago</div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- REPORT ISSUE PAGE -->
+      <div class="page" id="page-report">
+        <div class="page-header">
+          <h2>Report an Issue</h2>
+          <p>Fill in the details below and our team will respond promptly</p>
+        </div>
+        <!-- Box 1: Report Issue -->
+        <div class="card">
+          <div class="card-title"><span class="ct-icon">🐛</span> Issue Details</div>
+          <div class="form-row">
+            <div class="form-field">
+              <label>Issue Title *</label>
+              <input type="text" id="issueTitle" placeholder="Brief summary of the issue"/>
+            </div>
+            <div class="form-field">
+              <label>Priority *</label>
+              <select id="issuePriority">
+                <option value="">— Select Priority —</option>
+                <option value="high">🔴 High</option>
+                <option value="medium">🟡 Medium</option>
+                <option value="low">🟢 Low</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-field">
+              <label>Category</label>
+              <select>
+                <option>Technical / Bug</option>
+                <option>Account / Access</option>
+                <option>Performance</option>
+                <option>Feature Request</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label>Affected System</label>
+              <input type="text" placeholder="e.g. Login, Dashboard, Email..."/>
+            </div>
+          </div>
+          <div class="form-field">
+            <label>Describe the issue *</label>
+            <textarea id="issueDesc" placeholder="Please describe what happened, what you expected, and any steps to reproduce…"></textarea>
+          </div>
+        </div>
+
+        <!-- Box 2: Collaborate -->
+        <div class="card">
+          <div class="card-title"><span class="ct-icon">🤝</span> Collaborate on this Issue</div>
+          <div class="form-row">
+            <div class="form-field">
+              <label>Assign to Team</label>
+              <select>
+                <option>Backend Team</option>
+                <option>Frontend Team</option>
+                <option>DevOps</option>
+                <option>Security</option>
+                <option>Unassigned</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label>CC / Notify Users</label>
+              <input type="text" placeholder="email@company.com, another@company.com"/>
+            </div>
+          </div>
+          <div class="form-field">
+            <label>Additional Notes for Collaborators</label>
+            <textarea placeholder="Any internal notes, context, or investigation steps to share…" style="min-height:70px;"></textarea>
+          </div>
+        </div>
+
+        <!-- Box 3: Screenshot Upload -->
+        <div class="card">
+          <div class="card-title"><span class="ct-icon">📸</span> Attach Screenshot</div>
+          <div class="upload-zone" onclick="triggerUpload()">
+            <div class="uz-icon">🖼️</div>
+            <p>Drag & drop a screenshot here, or <span>browse to upload</span></p>
+            <p style="font-size:0.75rem;color:var(--text3);margin-top:6px;">PNG, JPG, GIF up to 10MB</p>
+            <input type="file" id="fileInput" accept="image/*" style="display:none" onchange="previewFile(event)"/>
+          </div>
+          <div class="upload-preview" id="uploadPreview">
+            <span style="font-size:1.5rem;">🖼️</span>
+            <div>
+              <div style="font-size:0.85rem;font-weight:600;" id="uploadFileName">screenshot.png</div>
+              <div style="font-size:0.75rem;color:var(--text3);">Ready to upload</div>
+            </div>
+            <button onclick="removeFile()" style="margin-left:auto;background:none;border:none;cursor:pointer;color:var(--cherry);font-size:1.2rem;">✕</button>
+          </div>
+        </div>
+
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+          <button class="btn-secondary" onclick="resetForm()">Clear Form</button>
+          <button class="btn-submit" onclick="submitTicket()">🚀 Submit Ticket</button>
+        </div>
+        <div class="success-toast" id="successToast">
+          ✅ Your ticket has been submitted successfully! Ticket ID: <strong id="newTicketId">#1043</strong> — Our team will respond within 30 minutes.
+        </div>
+      </div>
+
+      <!-- PROGRESS PAGE -->
+      <div class="page" id="page-progress">
+        <div class="page-header">
+          <h2>Progress & Analytics</h2>
+          <p>Track issue resolution rates and team performance</p>
+        </div>
+        <div class="filter-row">
+          <button class="filter-btn active" onclick="filterProgress('all', this)">All</button>
+          <button class="filter-btn" onclick="filterProgress('high', this)" data-color="red">🔴 High</button>
+          <button class="filter-btn" onclick="filterProgress('medium', this)" data-color="amber">🟡 Medium</button>
+          <button class="filter-btn" onclick="filterProgress('low', this)">🟢 Low</button>
+        </div>
+        <div class="stats-row" style="grid-template-columns:repeat(3,1fr);">
+          <div class="stat-card sc-high">
+            <div class="sc-label">High Resolved</div>
+            <div class="sc-value" style="color:var(--cherry)">24</div>
+            <div class="sc-meta">of 31 total · 77%</div>
+          </div>
+          <div class="stat-card sc-medium">
+            <div class="sc-label">Medium Resolved</div>
+            <div class="sc-value" style="color:#e67e22">41</div>
+            <div class="sc-meta">of 53 total · 77%</div>
+          </div>
+          <div class="stat-card sc-low">
+            <div class="sc-label">Low Resolved</div>
+            <div class="sc-value" style="color:var(--matcha)">18</div>
+            <div class="sc-meta">of 19 total · 95%</div>
+          </div>
+        </div>
+        <div class="charts-grid">
+          <div class="chart-wrap">
+            <h3>📊 Issues by Priority (Pie)</h3>
+            <div class="chart-canvas-wrap"><canvas id="pieChart"></canvas></div>
+          </div>
+          <div class="chart-wrap">
+            <h3>📈 Resolution Trend (Weekly)</h3>
+            <div class="chart-canvas-wrap"><canvas id="lineChart"></canvas></div>
+          </div>
+          <div class="chart-wrap">
+            <h3>🔢 Status Breakdown</h3>
+            <div class="chart-canvas-wrap"><canvas id="barChart"></canvas></div>
+          </div>
+          <div class="chart-wrap">
+            <h3>✅ Resolution Rate by Priority</h3>
+            <div class="progress-bar-list" style="margin-top:1rem;">
+              <div class="pbl-item">
+                <div class="pbl-head"><span>🔴 High Priority</span><span style="font-weight:600;color:var(--cherry)">77%</span></div>
+                <div class="pbl-bar"><div class="pbl-fill" style="width:77%;background:var(--cherry)"></div></div>
+              </div>
+              <div class="pbl-item">
+                <div class="pbl-head"><span>🟡 Medium Priority</span><span style="font-weight:600;color:#e67e22">77%</span></div>
+                <div class="pbl-bar"><div class="pbl-fill" style="width:77%;background:#e67e22"></div></div>
+              </div>
+              <div class="pbl-item">
+                <div class="pbl-head"><span>🟢 Low Priority</span><span style="font-weight:600;color:var(--matcha)">95%</span></div>
+                <div class="pbl-bar"><div class="pbl-fill" style="width:95%;background:var(--matcha)"></div></div>
+              </div>
+              <div class="pbl-item">
+                <div class="pbl-head"><span>📦 Overall</span><span style="font-weight:600;color:#8e44ad">83%</span></div>
+                <div class="pbl-bar"><div class="pbl-fill" style="width:83%;background:#8e44ad"></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ALL TICKETS PAGE -->
+      <div class="page" id="page-tickets">
+        <div class="page-header">
+          <h2>All Tickets</h2>
+          <p>View, filter, and update status of all support tickets</p>
+        </div>
+        <div class="filter-row">
+          <button class="filter-btn active" onclick="filterTickets('all',this)">All</button>
+          <button class="filter-btn" onclick="filterTickets('high',this)">🔴 High</button>
+          <button class="filter-btn" onclick="filterTickets('medium',this)">🟡 Medium</button>
+          <button class="filter-btn" onclick="filterTickets('low',this)">🟢 Low</button>
+          <button class="filter-btn" style="margin-left:auto;" onclick="filterTickets('open',this)">Opened</button>
+          <button class="filter-btn" onclick="filterTickets('ongoing',this)">On-Going</button>
+          <button class="filter-btn" onclick="filterTickets('working',this)">Working On</button>
+          <button class="filter-btn" onclick="filterTickets('closed',this)">Closed</button>
+        </div>
+        <div class="card" style="padding:0;overflow:hidden;">
+          <div class="recent-table-wrap">
+            <table class="tickets-table" id="allTicketsTable">
+              <thead><tr><th>ID</th><th>Subject</th><th>Reporter</th><th>Priority</th><th>Status</th><th>Created</th></tr></thead>
+              <tbody id="ticketsBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- TRANSPORT PAGE -->
+      <div class="page" id="page-transport">
+        <div class="page-header">
+          <h2>Train & Air Tickets</h2>
+          <p>Real-time transport tracking — arrivals, departures, and live status</p>
+        </div>
+        <div class="transport-tabs">
+          <button class="ttab active" onclick="switchTransportTab('trains', this)">🚂 Trains</button>
+          <button class="ttab" onclick="switchTransportTab('flights', this)">✈️ Flights</button>
+        </div>
+
+        <!-- TRAINS -->
+        <div class="transport-content active" id="tc-trains">
+          <div class="transport-sub-tabs">
+            <button class="tstab active" onclick="switchTrainSub('departing',this)">🟢 Departing</button>
+            <button class="tstab" onclick="switchTrainSub('arriving',this)">🔵 Arriving</button>
+            <button class="tstab" onclick="switchTrainSub('upcoming',this)">🕐 Upcoming</button>
+            <button class="tstab" onclick="switchTrainSub('here',this)">📍 At Station</button>
+          </div>
+          <div id="trainContent"></div>
+        </div>
+
+        <!-- FLIGHTS -->
+        <div class="transport-content" id="tc-flights">
+          <div class="transport-sub-tabs">
+            <button class="tstab active" onclick="switchFlightSub('here',this)">📍 At Airport</button>
+            <button class="tstab" onclick="switchFlightSub('departing',this)">🛫 Departing</button>
+            <button class="tstab" onclick="switchFlightSub('arriving',this)">🛬 Arriving</button>
+            <button class="tstab" onclick="switchFlightSub('safe',this)">✅ Safe/Landed</button>
+          </div>
+          <div id="flightContent"></div>
+        </div>
+      </div>
+
+      <!-- MY PROFILE PAGE -->
+      <div class="page" id="page-myprofile">
+        <div class="page-header">
+          <h2>My Profile</h2>
+          <p>Your account overview, access levels, and ticket handling history</p>
+        </div>
+        <!-- Profile header card -->
+        <div class="profile-page-header">
+          <div class="profile-avatar-lg" id="profileAvatarLg">AD</div>
+          <div class="profile-meta">
+            <h2 id="profilePageName">Admin User</h2>
+            <div class="pm-email" id="profilePageEmail">admin@techticket.com</div>
+            <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;">
+              <span class="role-badge">🛡️ Support Agent</span>
+              <span class="role-badge" style="background:#eaf2fb;color:#1a5276;">🕒 Active since Jun 2025</span>
+            </div>
+          </div>
+          <div style="margin-left:auto;text-align:right;">
+            <button onclick="showPage('settings')" style="background:var(--matcha);color:#fff;border:none;border-radius:8px;padding:9px 18px;font-size:0.85rem;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;">⚙️ Edit Settings</button>
+          </div>
+        </div>
+
+        <!-- Stats row -->
+        <div class="profile-stats-grid">
+          <div class="pstat-card" style="border-left:4px solid var(--matcha);">
+            <div class="ps-num" style="color:var(--matcha)">34</div>
+            <div class="ps-label">Tickets Handled</div>
+          </div>
+          <div class="pstat-card" style="border-left:4px solid #2ecc71;">
+            <div class="ps-num" style="color:#27ae60">28</div>
+            <div class="ps-label">Issues Resolved</div>
+          </div>
+          <div class="pstat-card" style="border-left:4px solid var(--cherry);">
+            <div class="ps-num" style="color:var(--cherry)">6</div>
+            <div class="ps-label">Pending / Open</div>
+          </div>
+          <div class="pstat-card" style="border-left:4px solid #8e44ad;">
+            <div class="ps-num" style="color:#8e44ad">82%</div>
+            <div class="ps-label">Resolution Rate</div>
+          </div>
+        </div>
+
+        <div class="profile-content-grid">
+          <!-- Access levels -->
+          <div class="card">
+            <div class="card-title"><span class="ct-icon">🔑</span> Access & Permissions</div>
+            <div class="access-item">
+              <div class="access-icon">🎟️</div>
+              <div class="access-label">Ticket Management</div>
+              <span class="access-badge access-full">Full Access</span>
+            </div>
+            <div class="access-item">
+              <div class="access-icon">📊</div>
+              <div class="access-label">Analytics & Reports</div>
+              <span class="access-badge access-full">Full Access</span>
+            </div>
+            <div class="access-item">
+              <div class="access-icon">🚉</div>
+              <div class="access-label">Transport Board</div>
+              <span class="access-badge access-full">Full Access</span>
+            </div>
+            <div class="access-item">
+              <div class="access-icon">👥</div>
+              <div class="access-label">User Management</div>
+              <span class="access-badge access-view">View Only</span>
+            </div>
+            <div class="access-item">
+              <div class="access-icon">⚙️</div>
+              <div class="access-label">System Settings</div>
+              <span class="access-badge access-view">View Only</span>
+            </div>
+            <div class="access-item">
+              <div class="access-icon">🔒</div>
+              <div class="access-label">Security Console</div>
+              <span class="access-badge access-none">No Access</span>
+            </div>
+          </div>
+
+          <!-- Tickets being handled -->
+          <div class="card">
+            <div class="card-title"><span class="ct-icon">📋</span> Tickets You're Handling</div>
+            <div class="ticket-mini-row">
+              <span class="tm-id">#1042</span>
+              <span class="tm-subject">Login page broken after update</span>
+              <span class="badge badge-high">High</span>
+              <span class="badge badge-open">Open</span>
+            </div>
+            <div class="ticket-mini-row">
+              <span class="tm-id">#1041</span>
+              <span class="tm-subject">Email notifications not sending</span>
+              <span class="badge badge-medium">Medium</span>
+              <span class="badge badge-ongoing">On-Going</span>
+            </div>
+            <div class="ticket-mini-row">
+              <span class="tm-id">#1037</span>
+              <span class="tm-subject">Mobile layout broken on iOS 17</span>
+              <span class="badge badge-high">High</span>
+              <span class="badge badge-open">Open</span>
+            </div>
+            <div class="ticket-mini-row">
+              <span class="tm-id">#1036</span>
+              <span class="tm-subject">2FA code not arriving via SMS</span>
+              <span class="badge badge-high">High</span>
+              <span class="badge badge-ongoing">On-Going</span>
+            </div>
+            <div class="ticket-mini-row">
+              <span class="tm-id">#1038</span>
+              <span class="tm-subject">Export to CSV missing columns</span>
+              <span class="badge badge-medium">Medium</span>
+              <span class="badge badge-working">Working On</span>
+            </div>
+            <div class="ticket-mini-row">
+              <span class="tm-id">#1040</span>
+              <span class="tm-subject">Dashboard loading very slowly</span>
+              <span class="badge badge-low">Low</span>
+              <span class="badge badge-working">Working On</span>
+            </div>
+            <div style="margin-top:12px;text-align:right;">
+              <button onclick="showPage('tickets')" style="background:none;border:1.5px solid var(--border);border-radius:8px;padding:7px 16px;font-size:0.82rem;font-weight:600;cursor:pointer;color:var(--text2);font-family:Inter,sans-serif;">View All Tickets →</button>
+            </div>
+          </div>
+
+          <!-- Resolution timeline -->
+          <div class="card">
+            <div class="card-title"><span class="ct-icon">✅</span> Recently Resolved</div>
+            <div class="resolution-timeline">
+              <div class="rtl-item">
+                <div class="rtl-dot-wrap"><div class="rtl-dot" style="background:#27ae60"></div><div class="rtl-line"></div></div>
+                <div class="rtl-body"><div class="rtl-title">#1039 — Password reset link expired</div><div class="rtl-time">Closed · Jun 11, 2026 · 18m resolution time</div></div>
+              </div>
+              <div class="rtl-item">
+                <div class="rtl-dot-wrap"><div class="rtl-dot" style="background:#27ae60"></div><div class="rtl-line"></div></div>
+                <div class="rtl-body"><div class="rtl-title">#1035 — Typo in welcome email</div><div class="rtl-time">Closed · Jun 9, 2026 · 5m resolution time</div></div>
+              </div>
+              <div class="rtl-item">
+                <div class="rtl-dot-wrap"><div class="rtl-dot" style="background:#27ae60"></div><div class="rtl-line"></div></div>
+                <div class="rtl-body"><div class="rtl-title">#1031 — API timeout on large exports</div><div class="rtl-time">Closed · Jun 8, 2026 · 45m resolution time</div></div>
+              </div>
+              <div class="rtl-item">
+                <div class="rtl-dot-wrap"><div class="rtl-dot" style="background:#27ae60"></div><div class="rtl-line"></div></div>
+                <div class="rtl-body"><div class="rtl-title">#1028 — Chart data showing wrong dates</div><div class="rtl-time">Closed · Jun 7, 2026 · 1h 12m resolution time</div></div>
+              </div>
+              <div class="rtl-item">
+                <div class="rtl-dot-wrap"><div class="rtl-dot" style="background:#27ae60"></div></div>
+                <div class="rtl-body"><div class="rtl-title">#1025 — Duplicate notifications bug</div><div class="rtl-time">Closed · Jun 6, 2026 · 27m resolution time</div></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Activity summary -->
+          <div class="card">
+            <div class="card-title"><span class="ct-icon">📈</span> This Week's Activity</div>
+            <div style="display:flex;flex-direction:column;gap:14px;margin-top:4px;">
+              <div>
+                <div style="display:flex;justify-content:space-between;font-size:0.83rem;margin-bottom:5px;"><span>Tickets Opened</span><span style="font-weight:700;color:var(--cherry)">7</span></div>
+                <div class="pbl-bar"><div class="pbl-fill" style="width:70%;background:var(--cherry)"></div></div>
+              </div>
+              <div>
+                <div style="display:flex;justify-content:space-between;font-size:0.83rem;margin-bottom:5px;"><span>Tickets Resolved</span><span style="font-weight:700;color:#27ae60">5</span></div>
+                <div class="pbl-bar"><div class="pbl-fill" style="width:50%;background:#27ae60"></div></div>
+              </div>
+              <div>
+                <div style="display:flex;justify-content:space-between;font-size:0.83rem;margin-bottom:5px;"><span>Avg. Response Time</span><span style="font-weight:700;color:#8e44ad">14 min</span></div>
+                <div class="pbl-bar"><div class="pbl-fill" style="width:28%;background:#8e44ad"></div></div>
+              </div>
+              <div>
+                <div style="display:flex;justify-content:space-between;font-size:0.83rem;margin-bottom:5px;"><span>User Satisfaction</span><span style="font-weight:700;color:var(--matcha)">92%</span></div>
+                <div class="pbl-bar"><div class="pbl-fill" style="width:92%;background:var(--matcha)"></div></div>
+              </div>
+            </div>
+            <div style="margin-top:1.2rem;padding-top:1rem;border-top:1px solid var(--border);">
+              <div style="font-size:0.78rem;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Quick Links</div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <button onclick="showPage('report')" style="background:var(--matcha-pale);color:var(--matcha-dark);border:1px solid var(--border);border-radius:8px;padding:6px 14px;font-size:0.8rem;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;">📝 Report Issue</button>
+                <button onclick="showPage('tickets')" style="background:var(--matcha-pale);color:var(--matcha-dark);border:1px solid var(--border);border-radius:8px;padding:6px 14px;font-size:0.8rem;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;">🎟️ All Tickets</button>
+                <button onclick="showPage('settings')" style="background:var(--matcha-pale);color:var(--matcha-dark);border:1px solid var(--border);border-radius:8px;padding:6px 14px;font-size:0.8rem;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;">⚙️ Settings</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SETTINGS PAGE -->
+      <div class="page" id="page-settings">
+        <div class="page-header">
+          <h2>Settings</h2>
+          <p>Manage your preferences, appearance, and account</p>
+        </div>
+        <div class="settings-grid">
+          <!-- Settings sidebar nav -->
+          <div class="settings-nav">
+            <div class="snav-item active" onclick="showSettingsSection('appearance',this)">🎨 Appearance</div>
+            <div class="snav-item" onclick="showSettingsSection('notifications',this)">🔔 Notifications</div>
+            <div class="snav-item" onclick="showSettingsSection('account',this)">👤 Account</div>
+            <div class="snav-item" onclick="showSettingsSection('accessibility',this)">♿ Accessibility</div>
+            <div class="snav-item" onclick="showSettingsSection('security',this)">🔒 Security</div>
+          </div>
+
+          <div>
+            <!-- APPEARANCE -->
+            <div class="settings-section active" id="ss-appearance">
+              <div class="settings-card">
+                <h3>Theme</h3>
+                <p class="sc-desc">Choose how TechTicket looks for you. This applies across the whole app.</p>
+                <div class="theme-options">
+                  <!-- Default (Matcha) -->
+                  <div class="theme-card selected" id="theme-default" onclick="applyTheme('default')">
+                    <div class="theme-preview" style="background:#f5f9f6;">
+                      <div class="tp-sidebar" style="background:#4a7c59;"></div>
+                      <div class="tp-main">
+                        <div class="tp-bar" style="background:#d4e6da;width:80%;"></div>
+                        <div class="tp-bar" style="background:#d4e6da;width:55%;"></div>
+                        <div class="tp-bar" style="background:#c0392b;width:40%;"></div>
+                      </div>
+                    </div>
+                    <div class="theme-name">🍵 Default</div>
+                    <div style="font-size:0.72rem;color:var(--text3);">Matcha green</div>
+                    <div class="theme-check">✓</div>
+                  </div>
+                  <!-- Dark -->
+                  <div class="theme-card" id="theme-dark" onclick="applyTheme('dark')">
+                    <div class="theme-preview" style="background:#0f1a14;">
+                      <div class="tp-sidebar" style="background:#1a2820;border:1px solid #2d4a38;"></div>
+                      <div class="tp-main">
+                        <div class="tp-bar" style="background:#2d4a38;width:80%;"></div>
+                        <div class="tp-bar" style="background:#2d4a38;width:55%;"></div>
+                        <div class="tp-bar" style="background:#922b21;width:40%;"></div>
+                      </div>
+                    </div>
+                    <div class="theme-name">🌙 Dark</div>
+                    <div style="font-size:0.72rem;color:var(--text3);">Dark forest</div>
+                    <div class="theme-check">✓</div>
+                  </div>
+                  <!-- White -->
+                  <div class="theme-card" id="theme-white" onclick="applyTheme('white')">
+                    <div class="theme-preview" style="background:#ffffff;border:1px solid #e0e0e0;">
+                      <div class="tp-sidebar" style="background:#fafafa;border-right:1px solid #e0e0e0;"></div>
+                      <div class="tp-main">
+                        <div class="tp-bar" style="background:#e0e0e0;width:80%;"></div>
+                        <div class="tp-bar" style="background:#e0e0e0;width:55%;"></div>
+                        <div class="tp-bar" style="background:#3a7d44;width:40%;"></div>
+                      </div>
+                    </div>
+                    <div class="theme-name">☀️ White</div>
+                    <div style="font-size:0.72rem;color:var(--text3);">Clean & minimal</div>
+                    <div class="theme-check">✓</div>
+                  </div>
+                </div>
+              </div>
+              <div class="settings-card">
+                <h3>Font Size</h3>
+                <p class="sc-desc">Adjust the base text size throughout the app.</p>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                  <button class="filter-btn active" onclick="setFontSize('small',this)">Small</button>
+                  <button class="filter-btn" onclick="setFontSize('medium',this)">Medium</button>
+                  <button class="filter-btn" onclick="setFontSize('large',this)">Large</button>
+                </div>
+              </div>
+              <div class="settings-card">
+                <h3>Sidebar</h3>
+                <p class="sc-desc">Control sidebar display preferences.</p>
+                <div class="toggle-row">
+                  <div><div class="toggle-label">Compact sidebar</div><div class="toggle-desc">Show only icons, no labels</div></div>
+                  <label class="toggle-switch"><input type="checkbox" onchange="toggleCompact(this)"/><span class="toggle-slider"></span></label>
+                </div>
+                <div class="toggle-row">
+                  <div><div class="toggle-label">Auto-collapse on mobile</div><div class="toggle-desc">Hide sidebar on small screens</div></div>
+                  <label class="toggle-switch"><input type="checkbox" checked/><span class="toggle-slider"></span></label>
+                </div>
+              </div>
+            </div>
+
+            <!-- NOTIFICATIONS -->
+            <div class="settings-section" id="ss-notifications">
+              <div class="settings-card">
+                <h3>Email Notifications</h3>
+                <p class="sc-desc">Choose which emails TechTicket sends you.</p>
+                <div class="toggle-row"><div><div class="toggle-label">New ticket assigned to me</div><div class="toggle-desc">Get notified when a ticket is assigned</div></div><label class="toggle-switch"><input type="checkbox" checked/><span class="toggle-slider"></span></label></div>
+                <div class="toggle-row"><div><div class="toggle-label">Ticket status changes</div><div class="toggle-desc">Updates when status changes on your tickets</div></div><label class="toggle-switch"><input type="checkbox" checked/><span class="toggle-slider"></span></label></div>
+                <div class="toggle-row"><div><div class="toggle-label">High priority alerts</div><div class="toggle-desc">Immediate email for high priority tickets</div></div><label class="toggle-switch"><input type="checkbox" checked/><span class="toggle-slider"></span></label></div>
+                <div class="toggle-row"><div><div class="toggle-label">Weekly summary report</div><div class="toggle-desc">Get a weekly digest every Monday</div></div><label class="toggle-switch"><input type="checkbox"/><span class="toggle-slider"></span></label></div>
+              </div>
+              <div class="settings-card">
+                <h3>In-App Notifications</h3>
+                <p class="sc-desc">Control notification badges and sounds.</p>
+                <div class="toggle-row"><div><div class="toggle-label">Show badge counter</div><div class="toggle-desc">Red dot on the notification bell</div></div><label class="toggle-switch"><input type="checkbox" checked/><span class="toggle-slider"></span></label></div>
+                <div class="toggle-row"><div><div class="toggle-label">Sound alerts</div><div class="toggle-desc">Play a sound for new notifications</div></div><label class="toggle-switch"><input type="checkbox"/><span class="toggle-slider"></span></label></div>
+              </div>
+            </div>
+
+            <!-- ACCOUNT -->
+            <div class="settings-section" id="ss-account">
+              <div class="settings-card">
+                <h3>Profile Information</h3>
+                <p class="sc-desc">Update your display name and contact details.</p>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                  <div class="form-field"><label>First name</label><input type="text" id="settingsFirst" placeholder="First name"/></div>
+                  <div class="form-field"><label>Last name</label><input type="text" id="settingsLast" placeholder="Last name"/></div>
+                </div>
+                <div class="form-field"><label>Email address</label><input type="email" id="settingsEmail" placeholder="you@company.com"/></div>
+                <div class="form-field"><label>Phone number</label><input type="tel" id="settingsPhone" placeholder="+91 98765 43210"/></div>
+                <button class="settings-btn primary" onclick="saveProfileSettings()">Save changes</button>
+                <div class="success-msg" id="profileSaveMsg" style="margin-top:10px;">Profile updated successfully!</div>
+              </div>
+              <div class="settings-card">
+                <h3>Change Password</h3>
+                <p class="sc-desc">Update your account password.</p>
+                <div class="form-field"><label>Current password</label><input type="password" id="curPwd" placeholder="Your current password"/></div>
+                <div class="form-field"><label>New password</label><input type="password" id="chgPwd1" placeholder="At least 6 characters"/></div>
+                <div class="form-field"><label>Confirm new password</label><input type="password" id="chgPwd2" placeholder="Repeat new password"/></div>
+                <div class="error-msg" id="pwdChangeErr"></div>
+                <div class="success-msg" id="pwdChangeOk">Password changed successfully!</div>
+                <button class="settings-btn primary" onclick="changePassword()">Update password</button>
+              </div>
+              <div class="settings-card">
+                <h3 style="color:var(--cherry)">Danger Zone</h3>
+                <p class="sc-desc">Irreversible actions for your account.</p>
+                <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                  <button class="settings-btn danger" onclick="if(confirm('Log out of all devices?')) doLogout()">Sign out everywhere</button>
+                  <button class="settings-btn danger" onclick="confirmDeleteAccount()">Delete account</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- ACCESSIBILITY -->
+            <div class="settings-section" id="ss-accessibility">
+              <div class="settings-card">
+                <h3>Accessibility Options</h3>
+                <p class="sc-desc">Make TechTicket more comfortable to use.</p>
+                <div class="toggle-row"><div><div class="toggle-label">Reduce motion</div><div class="toggle-desc">Minimize animations and transitions</div></div><label class="toggle-switch"><input type="checkbox"/><span class="toggle-slider"></span></label></div>
+                <div class="toggle-row"><div><div class="toggle-label">High contrast mode</div><div class="toggle-desc">Increase contrast for better readability</div></div><label class="toggle-switch"><input type="checkbox"/><span class="toggle-slider"></span></label></div>
+                <div class="toggle-row"><div><div class="toggle-label">Larger click targets</div><div class="toggle-desc">Make buttons and links easier to tap</div></div><label class="toggle-switch"><input type="checkbox"/><span class="toggle-slider"></span></label></div>
+                <div class="toggle-row"><div><div class="toggle-label">Screen reader optimised</div><div class="toggle-desc">Improve labels and ARIA attributes</div></div><label class="toggle-switch"><input type="checkbox"/><span class="toggle-slider"></span></label></div>
+              </div>
+            </div>
+
+            <!-- SECURITY -->
+            <div class="settings-section" id="ss-security">
+              <div class="settings-card">
+                <h3>Two-Factor Authentication</h3>
+                <p class="sc-desc">Add an extra layer of security to your account.</p>
+                <div class="toggle-row"><div><div class="toggle-label">Enable 2FA via SMS</div><div class="toggle-desc">Receive a code on your phone at each login</div></div><label class="toggle-switch"><input type="checkbox"/><span class="toggle-slider"></span></label></div>
+                <div class="toggle-row"><div><div class="toggle-label">Enable 2FA via Email</div><div class="toggle-desc">Receive a code in your inbox at each login</div></div><label class="toggle-switch"><input type="checkbox" checked/><span class="toggle-slider"></span></label></div>
+              </div>
+              <div class="settings-card">
+                <h3>Active Sessions</h3>
+                <p class="sc-desc">Devices currently signed in to your account.</p>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);">
+                  <div><div style="font-size:0.88rem;font-weight:500;">💻 This device</div><div style="font-size:0.75rem;color:var(--text3);">Chrome · Hyderabad, IN · Active now</div></div>
+                  <span style="font-size:0.75rem;color:var(--matcha);font-weight:600;">Current</span>
+                </div>
+                <div style="margin-top:12px;"><button class="settings-btn danger" onclick="if(confirm('Sign out of all other devices?')) alert('Done! All other sessions ended.')">Sign out other devices</button></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /main -->
+  </div><!-- /layout -->
+</div><!-- /appPage -->
+
+<script>
+// ===== DATA =====
+const allTickets = [
+  {id:'#1042',subject:'Login page broken after update',reporter:'Rahul Sharma',priority:'high',status:'open',created:'Jun 12, 2026'},
+  {id:'#1041',subject:'Email notifications not sending',reporter:'Priya Mehta',priority:'medium',status:'ongoing',created:'Jun 12, 2026'},
+  {id:'#1040',subject:'Dashboard loading very slowly',reporter:'Anil Kumar',priority:'low',status:'working',created:'Jun 11, 2026'},
+  {id:'#1039',subject:'Password reset link expired immediately',reporter:'Sneha Rao',priority:'high',status:'closed',created:'Jun 11, 2026'},
+  {id:'#1038',subject:'Export to CSV missing columns',reporter:'Deepak Nair',priority:'medium',status:'working',created:'Jun 10, 2026'},
+  {id:'#1037',subject:'Mobile layout broken on iOS 17',reporter:'Kavya Singh',priority:'high',status:'open',created:'Jun 10, 2026'},
+  {id:'#1036',subject:'2FA code not arriving via SMS',reporter:'Vivek Joshi',priority:'high',status:'ongoing',created:'Jun 9, 2026'},
+  {id:'#1035',subject:'Typo in welcome email',reporter:'Ananya Patel',priority:'low',status:'closed',created:'Jun 9, 2026'},
+];
+
+const trains = {
+  departing:[
+    {icon:'🚂',name:'Hyderabad Express 104',detail:'Platform 3 → Bengaluru City Jn',time:'14:35',eta:'Departing in 12 min',status:'open'},
+    {icon:'🚂',name:'Rajdhani Express 02430',detail:'Platform 1 → New Delhi',time:'15:00',eta:'Departing in 37 min',status:'working'},
+    {icon:'🚂',name:'Godavari Express 7006',detail:'Platform 5 → Visakhapatnam',time:'15:45',eta:'Departing in 82 min',status:'open'},
+  ],
+  arriving:[
+    {icon:'🚂',name:'Charminar Express 2760',detail:'From Chennai Central · Platform 2',time:'14:28',eta:'Arriving in 5 min',status:'ongoing'},
+    {icon:'🚂',name:'Falaknuma Express 7032',detail:'From Mumbai CST · Platform 4',time:'14:55',eta:'Arriving in 32 min',status:'open'},
+  ],
+  upcoming:[
+    {icon:'🚂',name:'Konark Express 11020',detail:'Platform TBA → Bhubaneswar',time:'17:20',eta:'In 3h 57m',status:'open'},
+    {icon:'🚂',name:'Sanghamitra Express 2722',detail:'Platform TBA → Bengaluru',time:'18:05',eta:'In 4h 42m',status:'open'},
+    {icon:'🚂',name:'Delhi Duronto 12214',detail:'Platform TBA → New Delhi',time:'20:30',eta:'In 7h 07m',status:'open'},
+  ],
+  here:[
+    {icon:'🚂',name:'Nanded Express 7605',detail:'Platform 6 — Boarding open',time:'At station',eta:'Departs 14:50',status:'working'},
+    {icon:'🚂',name:'Intercity 7090',detail:'Platform 7 — Crew boarding',time:'At station',eta:'Departs 15:10',status:'ongoing'},
+  ]
+};
+
+const flights = {
+  here:[
+    {icon:'✈️',name:'Air India AI-302',detail:'Gate A4 — Bengaluru • Boeing 787',time:'Terminal 1',eta:'Boarding 14:40',status:'ongoing'},
+    {icon:'✈️',name:'IndiGo 6E-781',detail:'Gate B12 — Mumbai • Airbus A320',time:'Terminal 2',eta:'Boarding 15:15',status:'open'},
+    {icon:'✈️',name:'Vistara UK-865',detail:'Gate C3 — Delhi • Airbus A321',time:'Terminal 1',eta:'Boarding 15:50',status:'open'},
+  ],
+  departing:[
+    {icon:'✈️',name:'SpiceJet SG-412',detail:'Runway 27L → Chennai',time:'14:50',eta:'Departing in 27 min',status:'working'},
+    {icon:'✈️',name:'GoAir G8-201',detail:'Runway 27R → Pune',time:'15:30',eta:'Departing in 67 min',status:'open'},
+  ],
+  arriving:[
+    {icon:'✈️',name:'Air India AI-545',detail:'From London Heathrow · Gate TBA',time:'16:20',eta:'Arriving in 2h 57m',status:'open'},
+    {icon:'✈️',name:'IndiGo 6E-190',detail:'From Kolkata · Gate B8',time:'15:10',eta:'Arriving in 47 min',status:'ongoing'},
+    {icon:'✈️',name:'Emirates EK-524',detail:'From Dubai · Gate A9',time:'15:55',eta:'Arriving in 1h 32m',status:'open'},
+  ],
+  safe:[
+    {icon:'✈️',name:'Vistara UK-801',detail:'Arrived from Mumbai · Gate A2',time:'Landed 13:42',eta:'All passengers disembarked',status:'closed'},
+    {icon:'✈️',name:'Air India AI-612',detail:'Arrived from Hyderabad · Gate C5',time:'Landed 13:15',eta:'Baggage at belt 4',status:'closed'},
+    {icon:'✈️',name:'SpiceJet SG-888',detail:'Arrived from Goa · Gate B3',time:'Landed 12:58',eta:'All clear',status:'closed'},
+  ]
+};
+
+// ===== USER STORE (localStorage) =====
+function getUsers(){ try{ return JSON.parse(localStorage.getItem('tt_users')||'[]'); }catch(e){ return []; } }
+function saveUsers(u){ localStorage.setItem('tt_users', JSON.stringify(u)); }
+function setSession(u){ localStorage.setItem('tt_session', JSON.stringify(u)); }
+function getSession(){ try{ return JSON.parse(localStorage.getItem('tt_session')||'null'); }catch(e){ return null; } }
+function clearSession(){ localStorage.removeItem('tt_session'); }
+
+// ===== AUTH PANEL TOGGLE =====
+function switchToSignup(){
+  document.getElementById('panelLogin').classList.remove('active');
+  document.getElementById('panelSignup').classList.add('active');
+  document.getElementById('loginError').style.display='none';
+}
+function switchToLogin(){
+  document.getElementById('panelSignup').classList.remove('active');
+  document.getElementById('panelLogin').classList.add('active');
+  document.getElementById('signupError').style.display='none';
+  document.getElementById('signupSuccess').style.display='none';
+}
+
+// ===== LOGIN =====
+function doLogin(){
+  const email=document.getElementById('loginEmail').value.trim();
+  const pwd=document.getElementById('loginPwd').value;
+  const errEl=document.getElementById('loginError');
+  errEl.style.display='none';
+  if(!email||!pwd){ errEl.textContent='Please enter your email and password.'; errEl.style.display='block'; return; }
+  const users=getUsers();
+  const user=users.find(u=>u.email.toLowerCase()===email.toLowerCase()&&u.password===pwd);
+  if(!user){ errEl.textContent='No account found with those credentials. Please sign up or try again.'; errEl.style.display='block'; return; }
+  setSession(user);
+  enterApp(user);
+}
+
+// ===== SIGNUP =====
+function doSignup(){
+  const first=document.getElementById('signupFirst').value.trim();
+  const last=document.getElementById('signupLast').value.trim();
+  const email=document.getElementById('signupEmail').value.trim();
+  const pwd=document.getElementById('signupPwd').value;
+  const pwd2=document.getElementById('signupPwd2').value;
+  const errEl=document.getElementById('signupError');
+  const okEl=document.getElementById('signupSuccess');
+  errEl.style.display='none'; okEl.style.display='none';
+  if(!first||!last||!email||!pwd||!pwd2){ errEl.textContent='Please fill in all fields.'; errEl.style.display='block'; return; }
+  if(pwd.length<6){ errEl.textContent='Password must be at least 6 characters.'; errEl.style.display='block'; return; }
+  if(pwd!==pwd2){ errEl.textContent='Passwords do not match.'; errEl.style.display='block'; return; }
+  const users=getUsers();
+  if(users.find(u=>u.email.toLowerCase()===email.toLowerCase())){ errEl.textContent='An account with this email already exists. Please sign in.'; errEl.style.display='block'; return; }
+  const newUser={name:first+' '+last, firstName:first, lastName:last, email, password:pwd};
+  users.push(newUser);
+  saveUsers(users);
+  setSession(newUser);
+  okEl.textContent='Account created! Signing you in…';
+  okEl.style.display='block';
+  setTimeout(()=>enterApp(newUser), 900);
+}
+
+// ===== ENTER APP =====
+function enterApp(user){
+  const initials=(user.firstName[0]+(user.lastName?user.lastName[0]:'')).toUpperCase();
+  document.getElementById('avatarInitials').textContent=initials;
+  document.getElementById('profileName').textContent=user.name;
+  document.getElementById('pdName').textContent=user.name;
+  document.getElementById('pdEmail').textContent=user.email;
+  // Profile page
+  document.getElementById('profileAvatarLg').textContent=initials;
+  document.getElementById('profilePageName').textContent=user.name;
+  document.getElementById('profilePageEmail').textContent=user.email;
+  document.getElementById('loginPage').style.display='none';
+  document.getElementById('appPage').style.display='flex';
+  document.getElementById('appPage').style.flexDirection='column';
+  renderTickets('all');
+  initCharts();
+  showTransportSub('departing');
+  showFlightSub('here');
+}
+
+function doLogout(){
+  clearSession();
+  document.getElementById('appPage').style.display='none';
+  document.getElementById('loginPage').style.display='flex';
+  document.getElementById('profileDropdown').classList.remove('open');
+  document.getElementById('loginEmail').value='';
+  document.getElementById('loginPwd').value='';
+  document.getElementById('loginError').style.display='none';
+}
+
+// Auto-login if session exists
+window.addEventListener('DOMContentLoaded',()=>{
+  const s=getSession();
+  if(s) enterApp(s);
+});
+function toggleProfile(){
+  document.getElementById('profileDropdown').classList.toggle('open');
+  document.getElementById('notifPanel').classList.remove('open');
+}
+function toggleNotifPanel(){
+  document.getElementById('notifPanel').classList.toggle('open');
+  document.getElementById('profileDropdown').classList.remove('open');
+}
+function switchNotifTab(tab, btn){
+  document.querySelectorAll('.notif-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.notif-section').forEach(s=>s.classList.remove('active'));
+  document.getElementById('ntab-'+tab).classList.add('active');
+}
+document.addEventListener('click', e=>{
+  if(!e.target.closest('.profile-wrap')) document.getElementById('profileDropdown').classList.remove('open');
+  if(!e.target.closest('.notif-panel') && !e.target.closest('#notifBtn')) document.getElementById('notifPanel').classList.remove('open');
+});
+
+// ===== NAVIGATION =====
+function showPage(name, el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  if(el) el.classList.add('active');
+  if(name==='transport'){
+    document.getElementById('transportNavItem').classList.add('active');
+  }
+  document.getElementById('profileDropdown').classList.remove('open');
+}
+function toggleTransportNav(el){
+  el.classList.toggle('expanded');
+  document.getElementById('transportSub').classList.toggle('open');
+}
+function showTransportSub(type){
+  showPage('transport');
+  if(type==='trains') switchTransportTab('trains', document.querySelector('.ttab'));
+  else switchTransportTab('flights', document.querySelectorAll('.ttab')[1]);
+  if(type==='trains') renderTrains('departing');
+  else renderFlights('here');
+}
+function showFlightSub(type){
+  renderFlights(type);
+}
+
+// ===== TRANSPORT =====
+let currentTrainSub='departing', currentFlightSub='here';
+function switchTransportTab(type, btn){
+  document.querySelectorAll('.ttab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.transport-content').forEach(c=>c.classList.remove('active'));
+  document.getElementById('tc-'+type).classList.add('active');
+  if(type==='trains') renderTrains(currentTrainSub);
+  else renderFlights(currentFlightSub);
+}
+function switchTrainSub(type, btn){
+  document.querySelectorAll('#tc-trains .tstab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  currentTrainSub=type;
+  renderTrains(type);
+}
+function switchFlightSub(type, btn){
+  if(btn) { document.querySelectorAll('#tc-flights .tstab').forEach(t=>t.classList.remove('active')); btn.classList.add('active'); }
+  currentFlightSub=type;
+  renderFlights(type);
+}
+function statusBadge(s){
+  const map={open:'badge-open',ongoing:'badge-ongoing',working:'badge-working',closed:'badge-closed'};
+  const lbl={open:'Opened',ongoing:'On-Going',working:'Working On',closed:'Closed'};
+  return `<span class="badge ${map[s]||'badge-open'}">${lbl[s]||s}</span>`;
+}
+function renderTransportList(items, containerId){
+  const c=document.getElementById(containerId);
+  if(!c) return;
+  c.innerHTML=items.map(it=>`
+    <div class="transport-card">
+      <div class="tc-icon">${it.icon}</div>
+      <div class="tc-main">
+        <div class="tc-name">${it.name}</div>
+        <div class="tc-detail">${it.detail}</div>
+      </div>
+      <div class="tc-time">
+        <div class="time">${it.time}</div>
+        <div class="eta">${it.eta}</div>
+      </div>
+      <div class="tc-status">${statusBadge(it.status)}</div>
+    </div>`).join('');
+}
+function renderTrains(type){ renderTransportList(trains[type]||[], 'trainContent'); }
+function renderFlights(type){ renderTransportList(flights[type]||[], 'flightContent'); }
+
+// ===== TICKETS =====
+function renderTickets(filter){
+  const tbody=document.getElementById('ticketsBody');
+  let data=allTickets;
+  if(filter&&filter!=='all') data=allTickets.filter(t=>t.priority===filter||t.status===filter);
+  const priMap={high:'badge-high',medium:'badge-medium',low:'badge-low'};
+  const priLabel={high:'High',medium:'Medium',low:'Low'};
+  tbody.innerHTML=data.map(t=>`
+    <tr data-priority="${t.priority}" data-status="${t.status}">
+      <td style="font-weight:600;color:var(--matcha)">${t.id}</td>
+      <td>${t.subject}</td>
+      <td style="color:var(--text2)">${t.reporter}</td>
+      <td><span class="badge ${priMap[t.priority]}">${priLabel[t.priority]}</span></td>
+      <td>
+        <select class="status-select" onchange="updateStatus(this,'${t.id}')">
+          <option value="open" ${t.status==='open'?'selected':''}>Opened</option>
+          <option value="ongoing" ${t.status==='ongoing'?'selected':''}>On-Going</option>
+          <option value="working" ${t.status==='working'?'selected':''}>Working On</option>
+          <option value="closed" ${t.status==='closed'?'selected':''}>Closed</option>
+        </select>
+      </td>
+      <td style="color:var(--text3)">${t.created}</td>
+    </tr>`).join('');
+}
+function filterTickets(filter, btn){
+  document.querySelectorAll('#page-tickets .filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderTickets(filter);
+}
+function updateStatus(sel, id){
+  const t=allTickets.find(x=>x.id===id);
+  if(t) t.status=sel.value;
+}
+
+// ===== REPORT FORM =====
+let ticketCounter=1043;
+function triggerUpload(){ document.getElementById('fileInput').click(); }
+function previewFile(e){
+  const f=e.target.files[0];
+  if(f){
+    document.getElementById('uploadFileName').textContent=f.name;
+    document.getElementById('uploadPreview').style.display='flex';
+  }
+}
+function removeFile(){
+  document.getElementById('fileInput').value='';
+  document.getElementById('uploadPreview').style.display='none';
+}
+function resetForm(){
+  document.getElementById('issueTitle').value='';
+  document.getElementById('issueDesc').value='';
+  document.getElementById('issuePriority').value='';
+  removeFile();
+  document.getElementById('successToast').style.display='none';
+}
+function submitTicket(){
+  const title=document.getElementById('issueTitle').value.trim();
+  const desc=document.getElementById('issueDesc').value.trim();
+  const prio=document.getElementById('issuePriority').value;
+  if(!title||!desc||!prio){ alert('Please fill in the required fields (Title, Priority, Description).'); return; }
+  const newId='#'+ticketCounter++;
+  const newTicket={id:newId,subject:title,reporter:'Current User',priority:prio,status:'open',created:'Jun 12, 2026'};
+  allTickets.unshift(newTicket);
+  document.getElementById('newTicketId').textContent=newId;
+  document.getElementById('successToast').style.display='flex';
+  renderTickets('all');
+}
+
+// ===== PROGRESS FILTER =====
+function filterProgress(type, btn){
+  document.querySelectorAll('#page-progress .filter-btn').forEach(b=>{
+    b.classList.remove('active','red','amber');
+  });
+  btn.classList.add('active');
+  if(type==='high') btn.classList.add('red');
+  if(type==='medium') btn.classList.add('amber');
+}
+
+// ===== CHARTS =====
+let chartsInited=false;
+function initCharts(){
+  if(chartsInited) return;
+  chartsInited=true;
+  const matcha='#4a7c59', cherry='#c0392b', amber='#e67e22', purple='#8e44ad';
+
+  // Pie chart
+  new Chart(document.getElementById('pieChart'),{
+    type:'doughnut',
+    data:{
+      labels:['High','Medium','Low'],
+      datasets:[{data:[31,53,19],backgroundColor:[cherry,amber,matcha],borderWidth:0,hoverOffset:6}]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{padding:16,font:{size:12,family:'Inter'}}}}
+    }
+  });
+
+  // Line chart
+  new Chart(document.getElementById('lineChart'),{
+    type:'line',
+    data:{
+      labels:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
+      datasets:[
+        {label:'High',data:[5,7,4,8,6,3,7],borderColor:cherry,backgroundColor:cherry+'22',tension:0.4,fill:true,borderWidth:2,pointRadius:4},
+        {label:'Medium',data:[8,10,12,9,11,7,10],borderColor:amber,backgroundColor:amber+'22',tension:0.4,fill:true,borderWidth:2,pointRadius:4},
+        {label:'Low',data:[3,4,2,5,3,6,4],borderColor:matcha,backgroundColor:matcha+'22',tension:0.4,fill:true,borderWidth:2,pointRadius:4}
+      ]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{padding:16,font:{size:12,family:'Inter'}}}},
+      scales:{x:{grid:{display:false}},y:{grid:{color:'#e8e8e8'}}}
+    }
+  });
+
+  // Bar chart
+  new Chart(document.getElementById('barChart'),{
+    type:'bar',
+    data:{
+      labels:['Opened','On-Going','Working On','Closed'],
+      datasets:[{
+        label:'Tickets',
+        data:[12,8,5,58],
+        backgroundColor:[cherry,amber,matcha,purple],
+        borderRadius:6, borderSkipped:false
+      }]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{display:false}},
+      scales:{x:{grid:{display:false}},y:{grid:{color:'#e8e8e8'}}}
+    }
+  });
+}
+let _forgotContact='', _generatedOtp='';
+function switchToForgot1(){
+  ['panelLogin','panelSignup','panelForgot2','panelForgot3'].forEach(id=>document.getElementById(id).classList.remove('active'));
+  document.getElementById('panelForgot1').classList.add('active');
+  document.getElementById('forgotError1').style.display='none';
+}
+function sendOtp(){
+  const contact=document.getElementById('forgotContact').value.trim();
+  const err=document.getElementById('forgotError1');
+  err.style.display='none';
+  if(!contact){ err.textContent='Please enter your email or phone number.'; err.style.display='block'; return; }
+  const users=getUsers();
+  const isEmail=contact.includes('@');
+  const found=isEmail
+    ? users.find(u=>u.email.toLowerCase()===contact.toLowerCase())
+    : users.find(u=>u.phone&&u.phone===contact);
+  if(!found){ err.textContent='No account found with that '+(isEmail?'email address':'phone number')+'.'; err.style.display='block'; return; }
+  _forgotContact=contact;
+  _generatedOtp=String(Math.floor(100000+Math.random()*900000));
+  console.log('[TechTicket demo] Your OTP is:', _generatedOtp);
+  document.getElementById('otpSentTo').textContent='Code sent to: '+contact+' (demo: check browser console → F12)';
+  for(let i=0;i<6;i++) document.getElementById('otp'+i).value='';
+  document.getElementById('forgotError2').style.display='none';
+  ['panelLogin','panelSignup','panelForgot1','panelForgot3'].forEach(id=>document.getElementById(id).classList.remove('active'));
+  document.getElementById('panelForgot2').classList.add('active');
+  setTimeout(()=>document.getElementById('otp0').focus(), 100);
+}
+function resendOtp(){
+  _generatedOtp=String(Math.floor(100000+Math.random()*900000));
+  console.log('[TechTicket demo] Resent OTP:', _generatedOtp);
+  alert('New code sent! Check browser console (F12) for the demo code.');
+}
+function otpMove(el, next){ if(el.value&&next>=0) document.getElementById('otp'+next).focus(); }
+function otpBack(e, el, prev){ if(e.key==='Backspace'&&!el.value&&prev!==null) document.getElementById('otp'+prev).focus(); }
+function verifyOtp(){
+  const entered=[0,1,2,3,4,5].map(i=>document.getElementById('otp'+i).value).join('');
+  const err=document.getElementById('forgotError2');
+  err.style.display='none';
+  if(entered.length<6){ err.textContent='Please enter all 6 digits.'; err.style.display='block'; return; }
+  if(entered!==_generatedOtp){ err.textContent='Incorrect code. Please try again or resend.'; err.style.display='block'; return; }
+  ['panelLogin','panelSignup','panelForgot1','panelForgot2'].forEach(id=>document.getElementById(id).classList.remove('active'));
+  document.getElementById('newPwd1').value='';
+  document.getElementById('newPwd2').value='';
+  document.getElementById('forgotError3').style.display='none';
+  document.getElementById('forgotSuccess3').style.display='none';
+  document.getElementById('panelForgot3').classList.add('active');
+}
+function doResetPassword(){
+  const p1=document.getElementById('newPwd1').value;
+  const p2=document.getElementById('newPwd2').value;
+  const err=document.getElementById('forgotError3');
+  const ok=document.getElementById('forgotSuccess3');
+  err.style.display='none'; ok.style.display='none';
+  if(!p1||!p2){ err.textContent='Please fill both fields.'; err.style.display='block'; return; }
+  if(p1.length<6){ err.textContent='Password must be at least 6 characters.'; err.style.display='block'; return; }
+  if(p1!==p2){ err.textContent='Passwords do not match.'; err.style.display='block'; return; }
+  const users=getUsers();
+  const idx=users.findIndex(u=>u.email.toLowerCase()===_forgotContact.toLowerCase()||(u.phone&&u.phone===_forgotContact));
+  if(idx>-1){ users[idx].password=p1; saveUsers(users); }
+  ok.textContent='Password updated successfully! Redirecting you to sign in…';
+  ok.style.display='block';
+  setTimeout(()=>switchToLogin(), 1800);
+}
+
+// ===== THEME =====
+function applyTheme(name){
+  document.body.classList.remove('theme-dark','theme-white');
+  if(name==='dark') document.body.classList.add('theme-dark');
+  if(name==='white') document.body.classList.add('theme-white');
+  document.querySelectorAll('.theme-card').forEach(c=>c.classList.remove('selected'));
+  const el=document.getElementById('theme-'+name);
+  if(el) el.classList.add('selected');
+  localStorage.setItem('tt_theme',name);
+}
+
+// ===== SETTINGS SECTIONS =====
+function showSettingsSection(name, el){
+  document.querySelectorAll('.settings-section').forEach(s=>s.classList.remove('active'));
+  document.getElementById('ss-'+name).classList.add('active');
+  document.querySelectorAll('.snav-item').forEach(s=>s.classList.remove('active'));
+  if(el) el.classList.add('active');
+  if(name==='account'){
+    const s=getSession();
+    if(s){
+      document.getElementById('settingsFirst').value=s.firstName||'';
+      document.getElementById('settingsLast').value=s.lastName||'';
+      document.getElementById('settingsEmail').value=s.email||'';
+      document.getElementById('settingsPhone').value=s.phone||'';
+    }
+  }
+}
+function saveProfileSettings(){
+  const first=document.getElementById('settingsFirst').value.trim();
+  const last=document.getElementById('settingsLast').value.trim();
+  const email=document.getElementById('settingsEmail').value.trim();
+  const phone=document.getElementById('settingsPhone').value.trim();
+  const s=getSession(); if(!s) return;
+  const users=getUsers();
+  const idx=users.findIndex(u=>u.email===s.email);
+  if(idx>-1){
+    users[idx]={...users[idx],firstName:first,lastName:last,name:first+' '+last,email,phone};
+    saveUsers(users); setSession(users[idx]);
+    document.getElementById('avatarInitials').textContent=(first[0]+(last?last[0]:'')).toUpperCase();
+    document.getElementById('profileName').textContent=first+' '+last;
+    document.getElementById('pdName').textContent=first+' '+last;
+    document.getElementById('pdEmail').textContent=email;
+    document.getElementById('profilePageName').textContent=first+' '+last;
+    document.getElementById('profilePageEmail').textContent=email;
+    document.getElementById('profileAvatarLg').textContent=(first[0]+(last?last[0]:'')).toUpperCase();
+  }
+  const ok=document.getElementById('profileSaveMsg');
+  ok.style.display='block';
+  setTimeout(()=>ok.style.display='none',3000);
+}
+function changePassword(){
+  const cur=document.getElementById('curPwd').value;
+  const n1=document.getElementById('chgPwd1').value;
+  const n2=document.getElementById('chgPwd2').value;
+  const err=document.getElementById('pwdChangeErr');
+  const ok=document.getElementById('pwdChangeOk');
+  err.style.display='none'; ok.style.display='none';
+  const s=getSession(); if(!s) return;
+  const users=getUsers();
+  const idx=users.findIndex(u=>u.email===s.email);
+  if(idx<0||users[idx].password!==cur){ err.textContent='Current password is incorrect.'; err.style.display='block'; return; }
+  if(n1.length<6){ err.textContent='New password must be at least 6 characters.'; err.style.display='block'; return; }
+  if(n1!==n2){ err.textContent='Passwords do not match.'; err.style.display='block'; return; }
+  users[idx].password=n1; saveUsers(users); setSession(users[idx]);
+  ok.style.display='block';
+  setTimeout(()=>ok.style.display='none',3000);
+}
+function confirmDeleteAccount(){
+  if(confirm('Are you sure you want to delete your account? This cannot be undone.')){
+    const s=getSession(); if(!s) return;
+    saveUsers(getUsers().filter(u=>u.email!==s.email));
+    clearSession(); doLogout();
+  }
+}
+function setFontSize(size, btn){
+  document.querySelectorAll('#ss-appearance .filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const map={small:'13px',medium:'15px',large:'17px'};
+  document.body.style.fontSize=map[size]||'15px';
+}
+function toggleCompact(cb){
+  document.querySelector('.sidebar').style.width=cb.checked?'64px':'240px';
+  document.querySelector('.main').style.marginLeft=cb.checked?'64px':'240px';
+  document.querySelectorAll('.sidebar-label').forEach(el=>el.style.display=cb.checked?'none':'');
+}
+
+// Load saved theme on DOMContentLoaded (second listener, merged with existing)
+window.addEventListener('load',()=>{
+  const t=localStorage.getItem('tt_theme');
+  if(t) applyTheme(t);
+});
+</script>
+</body>
+</html>
